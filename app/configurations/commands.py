@@ -3,7 +3,7 @@ from flask.cli import AppGroup
 
 
 def init_app(app: Flask):
-    cli_db_group = AppGroup('db')
+    cli_db_group = AppGroup('db_cli')
 
     @cli_db_group.command('create')
     def cli_db_create_all():

@@ -7,10 +7,10 @@ from app.configurations import authentication
 from app.configurations import commands
 from app import views
 
-
 def create_app():
     app = Flask(__name__)
 
+    
     config_type = getenv('FLASK_ENV')
     app.config.from_object(config_selector[config_type])
 
