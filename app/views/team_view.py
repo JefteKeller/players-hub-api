@@ -1,7 +1,5 @@
 from flask import Blueprint, request, current_app
 from flask_jwt_extended import (
-    create_access_token,
-    create_refresh_token,
     jwt_required,
     get_jwt_identity,
 )
@@ -9,14 +7,67 @@ from http import HTTPStatus
 from datetime import timedelta
 
 from app.models.team_model import TeamModel
+from app.models.team_user_model import TeamUserModel
 
 
 bp_team = Blueprint("team_view", __name__, url_prefix="/teams")
 
+
 @bp_team.route("/", methods=["POST"])
 @jwt_required()
 def register_team():
-    return {"msg": "Teste register team"}, HTTPStatus.OK
+    session = current_app.db.session
+
+    res = request.get_json()
+    team_name = res.get("team_name")
+    team_description = res.get("team_description")
+    owner_id = get_jwt_identity()
+
+    new_team = TeamModel(
+        team_name=team_name, team_description=team_description, owner_id=owner_id
+    )
+
+    session.add(new_team)
+
+    session.commit()
+
+    return {
+        "team": {
+            "team_name": new_team.team_name,
+            "team_description": new_team.team_description,
+            "owner_id": new_team.owner_id,
+            "team_created_date": new_team.team_created_date,
+        }
+    }, HTTPStatus.CREATED
+
+
+@bp_team.route("/<int:team_id>", methods=["POST"])
+@jwt_required()
+def register_player_in_team(team_id):
+    session = current_app.db.session
+    res = request.get_json()
+    user_id = res.get("user_id")
+    owner_id = get_jwt_identity()
+
+    verify_team_owner = TeamModel.query.filter_by(owner_id=owner_id).first()
+
+    if not verify_team_owner:
+        return {"msg": "You are not the team's owner!"}, HTTPStatus.FORBIDDEN
+
+    new_player_in_team = TeamUserModel(user_id=user_id, team_id=team_id)
+
+    session.add(new_player_in_team)
+
+    session.commit()
+
+    return {
+        "player_in_team": {
+            "user_id": new_player_in_team.user_id,
+            "team_id": new_player_in_team.team_id,
+            "owner_id": owner_id,
+        }
+    }, HTTPStatus.CREATED
+
 
 @bp_team.route("/", methods=["GET"])
 @jwt_required()
