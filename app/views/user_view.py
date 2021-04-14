@@ -1,7 +1,6 @@
 from flask import Blueprint, request, current_app
 from flask_jwt_extended import (
     create_access_token,
-    create_refresh_token,
     jwt_required,
     get_jwt_identity,
 )
@@ -28,6 +27,11 @@ def register():
     created_at = res.get("created_at")
     email = res.get("email")
     password = res.get("password")
+
+    verify_user: UserModel = UserModel.query.filter_by(email=email).first()
+
+    if verify_user:
+        return {"msg": f"{email} already exists"}, HTTPStatus.FORBIDDEN
 
     new_user = UserModel(
         nickname=nickname,
@@ -67,20 +71,46 @@ def login():
 
     found_user: UserModel = UserModel.query.filter_by(email=email).first()
 
+    if not found_user or not found_user.check_password(password):
+        return {"msg": "Incorrect user or password"}, HTTPStatus.UNAUTHORIZED
+
     access_token = create_access_token(
         identity=found_user.id, expires_delta=timedelta(days=7)
     )
-
-    if not found_user or not found_user.check_password(password):
-        return {"msg": "Incorrect user or password"}, HTTPStatus.BAD_REQUEST
     return {"accessToken": access_token}, HTTPStatus.OK
 
 
-@bp_user.route("/", methods=["GET"])
-def list_users():
-    return {"msg": "Teste users"}, HTTPStatus.OK
+@bp_user.route("/self", methods=["GET"])
+@jwt_required()
+def get_user():
+
+    user_id = get_jwt_identity()
+    logged_user: UserModel = UserModel.query.filter_by(id=user_id).first()
+
+    if not logged_user:
+        return {"msg": "You are not logged in!"}, HTTPStatus.NOT_FOUND
+
+    return {"msg": logged_user.first_name}, HTTPStatus.OK
 
 
-@bp_user.route("/", methods=["PATCH", "PUT"])
+@bp_user.route("/self", methods=["DELETE"])
+@jwt_required()
+def delete_user():
+    session = current_app.db.session
+
+    user_id = get_jwt_identity()
+    user_to_be_deleted: UserModel = UserModel.query.filter_by(id=user_id).first()
+
+    if not user_to_be_deleted:
+        return {"msg": f"You are not logged in!"}, HTTPStatus.NOT_FOUND
+
+    session.delete(user_to_be_deleted)
+    session.commit()
+
+    return {"msg": f"{user_to_be_deleted.email} deleted"}, HTTPStatus.OK
+
+
+@bp_user.route("/self", methods=["PATCH", "PUT"])
+@jwt_required()
 def update_user():
     return {"msg": "Teste update user"}, HTTPStatus.OK
