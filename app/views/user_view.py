@@ -114,3 +114,31 @@ def delete_user():
 @jwt_required()
 def update_user():
     return {"msg": "Teste update user"}, HTTPStatus.OK
+
+
+@bp_user.route("/", methods=["GET"])
+def users_list():
+    username_filter = request.args.get("nickname")
+
+    if username_filter:
+        list_of_users = (
+            UserModel.query.filter(UserModel.nickname.like(f"%{username_filter}%"))
+            .order_by(UserModel.nickname)
+            .all()
+        )
+    else:
+        list_of_users = UserModel.query.all()
+
+    return {
+        "users": [
+            {
+                "id": user.id,
+                "nickname": user.nickname,
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "biography": user.biography,
+            }
+            for user in list_of_users
+        ]
+    }, HTTPStatus.OK
