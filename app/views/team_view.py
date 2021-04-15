@@ -1,3 +1,4 @@
+from app.models.user_model import UserModel
 from flask import Blueprint, request, current_app
 from flask_jwt_extended import (
     jwt_required,
@@ -70,9 +71,20 @@ def register_player_in_team(team_id):
 
 
 @bp_team.route("/", methods=["GET"])
-@jwt_required()
 def list_teams():
-    return {"msg": "Teste list teams"}, HTTPStatus.OK
+    list_of_teams = TeamModel.query.all()
+
+    return {
+        "teams": [
+            {
+                "id": team.id,
+                "team_name": team.team_name,
+                "team_description": team.team_description,
+                "team_created_date": team.team_created_date,
+            }
+            for team in list_of_teams
+        ]
+    }, HTTPStatus.OK
 
 
 @bp_team.route("/get/", methods=["GET"])
