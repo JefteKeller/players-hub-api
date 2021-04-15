@@ -87,10 +87,20 @@ def list_teams():
     }, HTTPStatus.OK
 
 
-@bp_team.route("/get/", methods=["GET"])
+@bp_team.route("/<int:team_id>/", methods=["GET"])
 @jwt_required()
-def get_team():
-    return {"msg": "Teste get team"}, HTTPStatus.OK
+def get_team(team_id):
+    found_team: TeamModel = TeamModel.query.get(team_id)
+    if found_team:
+        return {
+            "team": {
+                "id": found_team.id,
+                "team_name": found_team.team_name,
+                "team_description": found_team.team_description,
+                "team_created_date": found_team.team_created_date,
+            }
+        }, HTTPStatus.OK
+    return {"msg": "team not found"}, HTTPStatus.NOT_FOUND
 
 
 @bp_team.route("/", methods=["PATCH", "PUT"])

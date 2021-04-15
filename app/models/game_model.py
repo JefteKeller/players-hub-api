@@ -11,4 +11,3 @@ class GameModel(db.Model):
     game_name = db.Column(db.String, nullable=False)
     game_type = db.Column(db.String, nullable=False)
     game_description = db.Column(db.String, nullable=False)
-
