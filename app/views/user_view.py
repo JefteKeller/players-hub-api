@@ -110,10 +110,56 @@ def delete_user():
     return {"msg": f"{user_to_be_deleted.email} deleted"}, HTTPStatus.OK
 
 
-@bp_user.route("/self", methods=["PATCH", "PUT"])
+@bp_user.route("/", methods=["PATCH"], strict_slashes=False)
 @jwt_required()
 def update_user():
-    return {"msg": "Teste update user"}, HTTPStatus.OK
+
+    user_id = get_jwt_identity()
+    found_user: UserModel = UserModel.query.get(user_id)
+
+    if not found_user:
+        return {"error": "User not found"}, HTTPStatus.BAD_REQUEST
+
+    data = request.get_json()
+
+    new_nickname = data.get("nickname")
+    new_first_name = data.get("first_name")
+    new_last_name = data.get("last_name")
+    new_password = data.get("password")
+    new_email = data.get("email")
+    new_biography = data.get("biography")
+
+    if new_email:
+        found_user.email = new_email
+
+    if new_password:
+        found_user.password = new_password
+
+    if new_nickname:
+        found_user.nickname = new_nickname
+
+    if new_first_name:
+        found_user.first_name = new_first_name
+
+    if new_last_name:
+        found_user.last_name = new_last_name
+
+    if new_biography:
+        found_user.biography = new_biography
+
+    session = current_app.db.session
+    session.add(found_user)
+    session.commit()
+
+    return {
+        "user": {
+            "email": found_user.email,
+            "nickname": found_user.nickname,
+            "first_name:": found_user.first_name,
+            "last_name": found_user.last_name,
+            "biography": found_user.biography,
+        }
+    }, HTTPStatus.OK
 
 
 @bp_user.route("/", methods=["GET"])
