@@ -1,14 +1,21 @@
-from os import getenv
+from environs import Env
+
+env = Env()
+
+env.read_env()
 
 
 class Config:
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JSON_SORT_KEYS = False
-    FLASK_RUN_PORT = getenv('FLASK_RUN_PORT')
-    JWT_SECRET_KEY = getenv('JWT_SECRET_KEY')
+    FLASK_RUN_PORT = env.int("FLASK_RUN_PORT")
+    JWT_SECRET_KEY = env.str("JWT_SECRET_KEY")
+
+    SQLALCHEMY_TRACK_MODIFICATIONS = env.bool("SQLALCHEMY_TRACK_MODIFICATIONS")
+    JSON_SORT_KEYS = env.bool("JSON_SORT_KEYS")
+
 
 class DevelopmentConfig(Config):
-    SQLALCHEMY_DATABASE_URI = getenv('DB_URI_DEV')
+    ...
+    SQLALCHEMY_DATABASE_URI = env.str("DB_URI_DEV")
 
 
 class ProductionConfig(Config):
@@ -16,11 +23,12 @@ class ProductionConfig(Config):
 
 
 class TestConfig(Config):
-    ...
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = env.str("DB_URI_TEST")
 
 
 config_selector = {
-    'development': DevelopmentConfig,
-    'production': ProductionConfig,
-    'test': TestConfig
+    "development": DevelopmentConfig,
+    "production": ProductionConfig,
+    "test": TestConfig,
 }
