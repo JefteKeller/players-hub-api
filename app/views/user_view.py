@@ -1,4 +1,3 @@
-import re
 from flask import Blueprint, request, current_app
 from flask_jwt_extended import (
     create_access_token,
@@ -9,6 +8,7 @@ from http import HTTPStatus
 from datetime import timedelta
 
 from app.models.user_model import UserModel
+from app.services import user_services
 
 
 bp_user = Blueprint("user_view", __name__, url_prefix="/users")
@@ -123,20 +123,10 @@ def update_user():
 
     data = request.get_json()
 
-    new_nickname = data.get("nickname")
-    new_first_name = data.get("first_name")
-    new_last_name = data.get("last_name")
-    new_password = data.get("password")
     new_email = data.get("email")
-    new_biography = data.get("biography")
+    new_password = data.get("password")
 
-    new_data = dict(
-        nickname=new_nickname,
-        first_name=new_first_name,
-        last_name=new_last_name,
-        biography=new_biography,
-    )
-    update_data = {key: value for key, value in new_data.items() if value}
+    update_data = user_services.get_user_update_data(data)
 
     if update_data:
         UserModel.query.filter_by(id=user_id).update(update_data)
