@@ -10,6 +10,7 @@ def test_register_user(app_client: FlaskClient):
             "last_name": "tt",
             "email": "jj@test.com",
             "password": "1234",
+            "biography": "Python is KING",
         },
     )
     assert response.status_code == 201
