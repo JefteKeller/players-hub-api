@@ -15,7 +15,26 @@ bp_location = Blueprint("location_view", __name__, url_prefix="/locations")
 @bp_location.route("/", methods=["POST"])
 @jwt_required()
 def register_location():
-    return {"msg": "Teste register location"}, HTTPStatus.OK
+    session = current_app.db.session
+
+    res = request.get_json()
+    location_name = res.get("location_name")
+    location_phone = res.get("location_phone")
+
+    new_location = LocationModel(
+        location_name=location_name, location_phone=location_phone
+    )
+
+    session.add(new_location)
+
+    session.commit()
+
+    return {
+        "location": {
+            "location_name": new_location.location_name,
+            "location_phone": new_location.location_phone,
+        }
+    }, HTTPStatus.CREATED
 
 
 @bp_location.route("/", methods=["GET"])

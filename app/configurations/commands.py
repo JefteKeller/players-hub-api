@@ -102,6 +102,7 @@ def init_app(app: Flask):
                 team_id_2=match["team_id_2"],
                 date=match["date"],
                 game_id=match["game_id"],
+                location_id=match["location_id"],
             )
 
             session.add(new_match)
@@ -113,7 +114,6 @@ def init_app(app: Flask):
             new_location = LocationModel(
                 location_name=location["location_name"],
                 location_phone=location["location_phone"],
-                match_id=location["match_id"],
             )
 
             session.add(new_location)
