@@ -24,6 +24,7 @@ class ProductionConfig(Config):
 
 class TestConfig(Config):
     TESTING = True
+    DEBUG = True
     SQLALCHEMY_DATABASE_URI = env.str("DB_URI_TEST")
 
 
