@@ -91,7 +91,16 @@ def get_user():
     if not logged_user:
         return {"msg": "You are not logged in!"}, HTTPStatus.NOT_FOUND
 
-    return {"msg": logged_user.first_name}, HTTPStatus.OK
+    return {
+        "user": {
+            "id": logged_user.id,
+            "nickname": logged_user.nickname,
+            "email": logged_user.email,
+            "first_name": logged_user.first_name,
+            "last_name": logged_user.last_name,
+            "biography": logged_user.biography,
+        }
+    }, HTTPStatus.OK
 
 
 @bp_user.route("/self", methods=["DELETE"])

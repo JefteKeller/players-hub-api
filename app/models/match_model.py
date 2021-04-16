@@ -46,3 +46,14 @@ class MatchModel(db.Model):
             lazy="joined",
         ),
     )
+
+    location_id = db.Column(db.Integer, db.ForeignKey("locations.id"))
+    location = db.relationship(
+        "LocationModel",
+        uselist=False,
+        lazy="joined",
+        backref=db.backref(
+            "match",
+            lazy="joined",
+        ),
+    )
