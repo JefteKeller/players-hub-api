@@ -1,3 +1,4 @@
+import re
 from flask import Blueprint, request, current_app
 from flask_jwt_extended import (
     create_access_token,
@@ -115,10 +116,10 @@ def delete_user():
 def update_user():
 
     user_id = get_jwt_identity()
-    found_user: UserModel = UserModel.query.get(user_id)
+    found_user: UserModel = UserModel.query.filter_by(id=user_id).first()
 
     if not found_user:
-        return {"error": "User not found"}, HTTPStatus.BAD_REQUEST
+        return {"error": "User not found"}, HTTPStatus.NOT_FOUND
 
     data = request.get_json()
 
@@ -129,23 +130,29 @@ def update_user():
     new_email = data.get("email")
     new_biography = data.get("biography")
 
+    new_data = dict(
+        nickname=new_nickname,
+        first_name=new_first_name,
+        last_name=new_last_name,
+        biography=new_biography,
+    )
+    update_data = {key: value for key, value in new_data.items() if value}
+
+    if update_data:
+        UserModel.query.filter_by(id=user_id).update(update_data)
+
     if new_email:
+        found_email = UserModel.query.filter_by(email=new_email).first()
+
+        if found_email:
+            return {
+                "error": "This email address is already being used"
+            }, HTTPStatus.CONFLICT
+
         found_user.email = new_email
 
     if new_password:
         found_user.password = new_password
-
-    if new_nickname:
-        found_user.nickname = new_nickname
-
-    if new_first_name:
-        found_user.first_name = new_first_name
-
-    if new_last_name:
-        found_user.last_name = new_last_name
-
-    if new_biography:
-        found_user.biography = new_biography
 
     session = current_app.db.session
     session.add(found_user)
