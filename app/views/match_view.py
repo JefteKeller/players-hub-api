@@ -20,12 +20,14 @@ def register_match():
     res = request.get_json()
     team_id_1 = res.get("team_id_1")
     team_id_2 = res.get("team_id_2")
+    game_id = res.get("game_id")
     match_winner = res.get("match_winner")
     date = res.get("date")
 
     new_match = MatchModel(
         team_id_1=team_id_1,
         team_id_2=team_id_2,
+        game_id=game_id,
         match_winner=match_winner,
         date=date,
     )
@@ -37,6 +39,7 @@ def register_match():
         "match": {
             "team_id_1": new_match.team_id_1,
             "team_id_2": new_match.team_id_2,
+            "game_id": new_match.game_id,
             "match_winner": new_match.match_winner,
             "date": new_match.date,
         }

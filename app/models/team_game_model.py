@@ -4,18 +4,18 @@
 from . import db
 
 
-class TeamUserModel(db.Model):
-    __tablename__ = "team_users"
+class TeamGameModel(db.Model):
+    __tablename__ = "team_games"
 
     id = db.Column(db.Integer, primary_key=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    user = db.relationship(
-        "UserModel",
+    game_id = db.Column(db.Integer, db.ForeignKey("games.id"))
+    game = db.relationship(
+        "GameModel",
         uselist=False,
         lazy="joined",
         backref=db.backref(
-            "team_user",
+            "team_game",
             lazy="joined",
         ),
     )
@@ -26,7 +26,7 @@ class TeamUserModel(db.Model):
         uselist=False,
         lazy="joined",
         backref=db.backref(
-            "team_user",
+            "team_game",
             lazy="joined",
         ),
     )

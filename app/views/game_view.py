@@ -9,6 +9,7 @@ from http import HTTPStatus
 from datetime import timedelta
 
 from app.models.game_model import GameModel
+from app.models.team_game_model import TeamGameModel
 
 
 bp_game = Blueprint("game_view", __name__, url_prefix="/games")
@@ -39,6 +40,31 @@ def register_game():
             "game_name": new_game.game_name,
             "game_type": new_game.game_type,
             "game_description": new_game.game_description,
+        }
+    }, HTTPStatus.CREATED
+
+
+@bp_game.route("/<int:game_id>", methods=["POST"])
+@jwt_required()
+def register_team_in_game(game_id):
+    session = current_app.db.session
+
+    res = request.get_json()
+    team_id = res.get("team_id")
+
+    new_team_game = TeamGameModel(
+        game_id=game_id,
+        team_id=team_id,
+    )
+
+    session.add(new_team_game)
+
+    session.commit()
+
+    return {
+        "game": {
+            "game_id": new_team_game.game_id,
+            "team_id": new_team_game.team_id,
         }
     }, HTTPStatus.CREATED
 

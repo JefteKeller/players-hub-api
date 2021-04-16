@@ -8,6 +8,7 @@ from http import HTTPStatus
 from datetime import timedelta
 
 from app.models.user_model import UserModel
+from app.services import user_services
 
 
 bp_user = Blueprint("user_view", __name__, url_prefix="/users")
@@ -90,7 +91,16 @@ def get_user():
     if not logged_user:
         return {"msg": "You are not logged in!"}, HTTPStatus.NOT_FOUND
 
-    return {"msg": logged_user.first_name}, HTTPStatus.OK
+    return {
+        "user": {
+            "id": logged_user.id,
+            "nickname": logged_user.nickname,
+            "email": logged_user.email,
+            "first_name": logged_user.first_name,
+            "last_name": logged_user.last_name,
+            "biography": logged_user.biography,
+        }
+    }, HTTPStatus.OK
 
 
 @bp_user.route("/self", methods=["DELETE"])
@@ -110,10 +120,52 @@ def delete_user():
     return {"msg": f"{user_to_be_deleted.email} deleted"}, HTTPStatus.OK
 
 
-@bp_user.route("/self", methods=["PATCH", "PUT"])
+@bp_user.route("/", methods=["PATCH"], strict_slashes=False)
 @jwt_required()
 def update_user():
-    return {"msg": "Teste update user"}, HTTPStatus.OK
+
+    user_id = get_jwt_identity()
+    found_user: UserModel = UserModel.query.filter_by(id=user_id).first()
+
+    if not found_user:
+        return {"error": "User not found"}, HTTPStatus.NOT_FOUND
+
+    data = request.get_json()
+
+    new_email = data.get("email")
+    new_password = data.get("password")
+
+    update_data = user_services.get_user_update_data(data)
+
+    if update_data:
+        UserModel.query.filter_by(id=user_id).update(update_data)
+
+    if new_email:
+        found_email = UserModel.query.filter_by(email=new_email).first()
+
+        if found_email:
+            return {
+                "error": "This email address is already being used"
+            }, HTTPStatus.CONFLICT
+
+        found_user.email = new_email
+
+    if new_password:
+        found_user.password = new_password
+
+    session = current_app.db.session
+    session.add(found_user)
+    session.commit()
+
+    return {
+        "user": {
+            "email": found_user.email,
+            "nickname": found_user.nickname,
+            "first_name:": found_user.first_name,
+            "last_name": found_user.last_name,
+            "biography": found_user.biography,
+        }
+    }, HTTPStatus.OK
 
 
 @bp_user.route("/", methods=["GET"])
