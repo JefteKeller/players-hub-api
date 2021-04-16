@@ -1,6 +1,8 @@
-from operator import index
+# // Disabling errors of ORM type due to how SQLAlchemy works
+# type: ignore
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+
 from . import db
 
 

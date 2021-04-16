@@ -1,3 +1,6 @@
+# // Disabling errors of ORM type due to how SQLAlchemy works
+# type: ignore
+
 from app.configurations.database import db
 
 from .user_model import UserModel

@@ -1,5 +1,8 @@
-from sqlalchemy.orm import backref
+# // Disabling errors of ORM type due to how SQLAlchemy works
+# type: ignore
+
 from datetime import datetime
+
 from . import db
 
 
