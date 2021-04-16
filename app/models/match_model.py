@@ -1,5 +1,5 @@
-from sqlalchemy.orm import backref
-from werkzeug.security import generate_password_hash, check_password_hash
+# // Disabling errors of ORM type due to how SQLAlchemy works
+# type: ignore
 
 from . import db
 
