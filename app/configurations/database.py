@@ -10,6 +10,7 @@ def init_app(app: Flask):
 
     from app.models.user_model import UserModel
     from app.models.team_user_model import TeamUserModel
+    from app.models.team_game_model import TeamGameModel
     from app.models.team_model import TeamModel
     from app.models.game_model import GameModel
     from app.models.location_model import LocationModel
