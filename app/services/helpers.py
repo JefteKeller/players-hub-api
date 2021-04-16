@@ -85,6 +85,7 @@ populate_matches = [
         "team_id_2": 2,
         "date": "06/06/21",
         "game_id": 1,
+        "location_id": 1,
     },
     {
         "match_winner": "team3",
@@ -92,6 +93,7 @@ populate_matches = [
         "team_id_2": 3,
         "date": "25/04/21",
         "game_id": 3,
+        "location_id": 2,
     },
     {
         "match_winner": "team1",
@@ -99,6 +101,7 @@ populate_matches = [
         "team_id_2": 4,
         "date": "30/03/21",
         "game_id": 3,
+        "location_id": 3,
     },
     {
         "match_winner": "team3",
@@ -106,6 +109,7 @@ populate_matches = [
         "team_id_2": 3,
         "date": "24/10/21",
         "game_id": 1,
+        "location_id": 1,
     },
     {
         "match_winner": "team2",
@@ -113,6 +117,7 @@ populate_matches = [
         "team_id_2": 4,
         "date": "12/01/21",
         "game_id": 2,
+        "location_id": 2,
     },
     {
         "match_winner": "team4",
@@ -120,6 +125,7 @@ populate_matches = [
         "team_id_2": 4,
         "date": "05/04/21",
         "game_id": 1,
+        "location_id": 3,
     },
 ]
 
@@ -127,17 +133,14 @@ populate_locations = [
     {
         "location_name": "Sua casa",
         "location_phone": "Seu Telefone",
-        "match_id": 1,
     },
     {
         "location_name": "Campo do Joquinha",
         "location_phone": "(41) 3558-4178",
-        "match_id": 5,
     },
     {
         "location_name": "Clube de Xadrez do Jefte",
         "location_phone": "(41) 98514-1317",
-        "match_id": 2,
     },
 ]
 
