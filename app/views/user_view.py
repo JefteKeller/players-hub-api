@@ -16,7 +16,7 @@ bp_register = Blueprint("register_view", __name__, url_prefix="/register")
 bp_login = Blueprint("login_view", __name__, url_prefix="/login")
 
 
-@bp_register.route("/", methods=["POST"])
+@bp_register.route("/", methods=["POST"], strict_slashes=False)
 def register():
     session = current_app.db.session
 
@@ -64,7 +64,7 @@ def register():
     }, HTTPStatus.CREATED
 
 
-@bp_login.route("/", methods=["POST"])
+@bp_login.route("/", methods=["POST"], strict_slashes=False)
 def login():
     res = request.get_json()
     email = res.get("email")
@@ -81,7 +81,7 @@ def login():
     return {"accessToken": access_token}, HTTPStatus.OK
 
 
-@bp_user.route("/self", methods=["GET"])
+@bp_user.route("/self", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def get_user():
 
@@ -168,7 +168,7 @@ def update_user():
     }, HTTPStatus.OK
 
 
-@bp_user.route("/", methods=["GET"])
+@bp_user.route("/", methods=["GET"], strict_slashes=False)
 def users_list():
     username_filter = request.args.get("nickname")
 
