@@ -133,13 +133,6 @@ def update_user():
     data = request.get_json()
 
     new_email = data.get("email")
-    new_password = data.get("password")
-
-    update_data = user_services.get_user_update_data(data)
-
-    if update_data:
-        UserModel.query.filter_by(id=user_id).update(update_data)
-
     if new_email:
         found_email = UserModel.query.filter_by(email=new_email).first()
 
@@ -148,10 +141,7 @@ def update_user():
                 "error": "This email address is already being used"
             }, HTTPStatus.CONFLICT
 
-        found_user.email = new_email
-
-    if new_password:
-        found_user.password = new_password
+    [setattr(found_user, key, value) for key, value in data.items()]
 
     session = current_app.db.session
     session.add(found_user)
