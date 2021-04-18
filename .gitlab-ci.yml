@@ -1,0 +1,30 @@
+services:
+    - name: postgres:12.6
+      alias: db-postgres
+
+variables:
+    POSTGRES_DB: test_players_hub
+    POSTGRES_USER: test_keller
+    POSTGRES_PASSWORD: "test_4456"
+    POSTGRES_HOST_AUTH_METHOD: trust
+
+image: python:3.9.4
+
+stages:
+    - testing
+    - formatting
+
+before_script:
+    - python -V
+    - python -m pip install -U pip
+    - python -m pip install -r requirements.txt
+
+Tests:
+    stage: testing
+    script:
+        - python -m pytest -svv
+
+Formatting Checks:
+    stage: formatting
+    script:
+        - python -m black --check .
