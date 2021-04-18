@@ -13,4 +13,4 @@ def test_register_user(app_client: FlaskClient):
             "biography": "Python is KING",
         },
     )
-    assert response.status_code == 201
+    assert response.status_code == 409
