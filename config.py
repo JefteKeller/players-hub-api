@@ -14,12 +14,11 @@ class Config:
 
 
 class DevelopmentConfig(Config):
-    ...
     SQLALCHEMY_DATABASE_URI = env.str("DB_URI_DEV")
 
 
 class ProductionConfig(Config):
-    ...
+    SQLALCHEMY_DATABASE_URI = env.str("DB_URI_PROD")
 
 
 class TestConfig(Config):
