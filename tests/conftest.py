@@ -8,7 +8,7 @@ from app.models import UserModel
 
 @fixture
 def sample_app():
-    yield create_app()
+    yield create_app("test")
 
 
 @fixture
