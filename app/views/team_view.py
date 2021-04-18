@@ -13,7 +13,7 @@ from app.models.team_user_model import TeamUserModel
 bp_team = Blueprint("team_view", __name__, url_prefix="/teams")
 
 
-@bp_team.route("/", methods=["POST"])
+@bp_team.route("/", methods=["POST"], strict_slashes=False)
 @jwt_required()
 def register_team():
     session = current_app.db.session
@@ -41,7 +41,7 @@ def register_team():
     }, HTTPStatus.CREATED
 
 
-@bp_team.route("/<int:team_id>", methods=["POST"])
+@bp_team.route("/<int:team_id>", methods=["POST"], strict_slashes=False)
 @jwt_required()
 def register_player_in_team(team_id):
     session = current_app.db.session
@@ -69,7 +69,7 @@ def register_player_in_team(team_id):
     }, HTTPStatus.CREATED
 
 
-@bp_team.route("/", methods=["GET"])
+@bp_team.route("/", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def list_teams():
     list_of_teams = TeamModel.query.all()
@@ -87,7 +87,7 @@ def list_teams():
     }, HTTPStatus.OK
 
 
-@bp_team.route("/<int:team_id>/", methods=["GET"])
+@bp_team.route("/<int:team_id>/", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def get_team(team_id):
     found_team: TeamModel = TeamModel.query.get(team_id)
@@ -103,7 +103,7 @@ def get_team(team_id):
     return {"msg": "team not found"}, HTTPStatus.NOT_FOUND
 
 
-@bp_team.route("/", methods=["PATCH", "PUT"])
+@bp_team.route("/", methods=["PATCH"], strict_slashes=False)
 @jwt_required()
 def update_team():
     return {"msg": "Teste update team"}, HTTPStatus.OK

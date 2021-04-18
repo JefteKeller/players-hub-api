@@ -12,7 +12,7 @@ from app.models.match_model import MatchModel
 bp_match = Blueprint("match_view", __name__, url_prefix="/matches")
 
 
-@bp_match.route("/", methods=["POST"])
+@bp_match.route("/", methods=["POST"], strict_slashes=False)
 @jwt_required()
 def register_match():
     session = current_app.db.session
@@ -46,19 +46,19 @@ def register_match():
     }, HTTPStatus.CREATED
 
 
-@bp_match.route("/", methods=["GET"])
+@bp_match.route("/", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def list_matches():
     return {"msg": "Teste list matches"}, HTTPStatus.OK
 
 
-@bp_match.route("/get/", methods=["GET"])
+@bp_match.route("/get/", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def get_match():
     return {"msg": "Teste get match"}, HTTPStatus.OK
 
 
-@bp_match.route("/", methods=["PATCH", "PUT"])
+@bp_match.route("/", methods=["PATCH"], strict_slashes=False)
 @jwt_required()
 def update_match():
     return {"msg": "Teste update match"}, HTTPStatus.OK
