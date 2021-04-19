@@ -84,7 +84,7 @@ def init_app(app: Flask):
     def create_match():
         for match in populate_matches:
             new_match = MatchModel(
-                match_winner=match["match_winner"],
+                match_winner_id=match["match_winner_id"],
                 team_id_1=match["team_id_1"],
                 team_id_2=match["team_id_2"],
                 date=match["date"],
