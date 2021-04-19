@@ -80,7 +80,7 @@ populate_games = [
 
 populate_matches = [
     {
-        "match_winner": "team1",
+        "match_winner_id": 1,
         "team_id_1": 1,
         "team_id_2": 2,
         "date": "06/06/21",
@@ -88,7 +88,7 @@ populate_matches = [
         "location_id": 1,
     },
     {
-        "match_winner": "team3",
+        "match_winner_id": 3,
         "team_id_1": 1,
         "team_id_2": 3,
         "date": "25/04/21",
@@ -96,7 +96,7 @@ populate_matches = [
         "location_id": 2,
     },
     {
-        "match_winner": "team1",
+        "match_winner_id": 1,
         "team_id_1": 1,
         "team_id_2": 4,
         "date": "30/03/21",
@@ -104,7 +104,7 @@ populate_matches = [
         "location_id": 3,
     },
     {
-        "match_winner": "team3",
+        "match_winner_id": 3,
         "team_id_1": 2,
         "team_id_2": 3,
         "date": "24/10/21",
@@ -112,7 +112,7 @@ populate_matches = [
         "location_id": 1,
     },
     {
-        "match_winner": "team2",
+        "match_winner_id": 4,
         "team_id_1": 2,
         "team_id_2": 4,
         "date": "12/01/21",
@@ -120,7 +120,7 @@ populate_matches = [
         "location_id": 2,
     },
     {
-        "match_winner": "team4",
+        "match_winner_id": 4,
         "team_id_1": 3,
         "team_id_2": 4,
         "date": "05/04/21",
