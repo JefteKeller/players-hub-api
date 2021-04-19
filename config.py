@@ -6,7 +6,6 @@ env.read_env()
 
 
 class Config:
-    FLASK_RUN_PORT = env.int("FLASK_RUN_PORT")
     JWT_SECRET_KEY = env.str("JWT_SECRET_KEY")
 
     SQLALCHEMY_TRACK_MODIFICATIONS = env.bool("SQLALCHEMY_TRACK_MODIFICATIONS")
