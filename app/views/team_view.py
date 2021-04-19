@@ -151,7 +151,7 @@ def delete_team_user():
 
 
 @bp_team.route("/self", methods=["DELETE"])
-@jwt_required(optional=True)
+@jwt_required()
 def all_team_user():
     session = current_app.db.session
     res = request.get_json()
