@@ -72,12 +72,23 @@ def register_team_in_game(game_id):
 @bp_game.route("/", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def list_games():
-    return {"msg": "Teste list games"}, HTTPStatus.OK
+
+    list_of_games: GameModel = GameModel.query.all()
+
+    return {
+        "games": {
+            "id": list_of_games.id,
+            "game_name": list_of_games.game_name,
+            "game_type": list_of_games.game_type,
+            "game_description": list_of_games.game_description,
+        }
+    }, HTTPStatus.OK
 
 
-@bp_game.route("/get/", methods=["GET"], strict_slashes=False)
+@bp_game.route("/get/<int:game_id>", methods=["GET"], strict_slashes=False)
 @jwt_required()
-def get_game():
+def get_game(game_id):
+
     return {"msg": "Teste get game"}, HTTPStatus.OK
 
 

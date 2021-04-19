@@ -57,6 +57,7 @@ def list_matches():
 @bp_match.route("/<int:match_id>", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def get_match(match_id):
+
     match = match_serializer(match_id)
 
     return {"match": match}, HTTPStatus.OK
