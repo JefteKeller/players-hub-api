@@ -107,4 +107,26 @@ def get_team(team_id):
 @bp_team.route("/", methods=["PATCH"], strict_slashes=False)
 @jwt_required()
 def update_team():
-    return {"msg": "Teste update team"}, HTTPStatus.OK
+
+    session = current_app.db.session
+
+    owner_id = get_jwt_identity()
+
+    body: dict = request.get_json()
+
+    found_team: TeamModel = TeamModel.query.filter_by(owner_id=owner_id).first()
+
+    for key, value in body.items():
+        setattr(found_team, key, value)
+
+    session.add(found_team)
+    session.commit()
+
+    return {
+        "team": {
+            "team_name": found_team.team_name,
+            "team_description": found_team.team_description,
+            "owner_id": found_team.owner_id,
+            "team_create_date": found_team.team_created_date,
+        }
+    }, HTTPStatus.OK
