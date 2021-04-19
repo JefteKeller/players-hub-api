@@ -27,6 +27,7 @@ Tests:
 
         JSON_SORT_KEYS: "False"
         SQLALCHEMY_TRACK_MODIFICATIONS: "False"
+        DATABASE_URL: ""
 
         DB_URI_TEST: "postgresql://test_keller:test_4456@postgres:5432/test_players_hub"
         DB_URI_DEV: ""
