@@ -70,12 +70,8 @@ def register_player_in_team(team_id):
     }, HTTPStatus.CREATED
 
 
-<<<<<<< HEAD
-@bp_team.route("/", methods=["GET"])
-=======
 @bp_team.route("/", methods=["GET"], strict_slashes=False)
 @jwt_required()
->>>>>>> 21c325228857ce2cda8a7206b5d32c462523007c
 def list_teams():
     list_of_teams = TeamModel.query.all()
 
