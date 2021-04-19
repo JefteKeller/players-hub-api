@@ -76,12 +76,15 @@ def list_games():
     list_of_games: GameModel = GameModel.query.all()
 
     return {
-        "games": {
-            "id": list_of_games.id,
-            "game_name": list_of_games.game_name,
-            "game_type": list_of_games.game_type,
-            "game_description": list_of_games.game_description,
-        }
+        "games": [
+            {
+                "id": game.id,
+                "game_name": game.game_name,
+                "game_type": game.game_type,
+                "game_description": game.game_description,
+            }
+            for game in list_of_games
+        ]
     }, HTTPStatus.OK
 
 
