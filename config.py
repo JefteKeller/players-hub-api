@@ -25,6 +25,7 @@ class TestConfig(Config):
     TESTING = True
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = env.str("DB_URI_TEST")
+    JWT_VERIFY = False
 
 
 config_selector = {
