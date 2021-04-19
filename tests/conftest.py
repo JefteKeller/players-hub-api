@@ -1,5 +1,8 @@
 from flask import Flask
 from pytest import fixture
+import pytest
+from flask_jwt_extended import create_access_token
+from datetime import timedelta
 
 from app import create_app
 from app.services.helpers import populate_users
@@ -45,3 +48,12 @@ def app_client(sample_app: Flask):
 
         session.close()
         sample_app.db.drop_all()
+
+
+@pytest.fixture()
+def test_token(sample_app):
+    with sample_app.test_request_context():
+
+        return {
+            "Authorization": f"Bearer {create_access_token(identity=1, expires_delta=timedelta(days=7))}"
+        }

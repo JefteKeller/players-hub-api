@@ -1,3 +1,4 @@
+from typing import Optional
 from flask import Blueprint, request, current_app
 from flask_jwt_extended import (
     create_access_token,
@@ -104,7 +105,7 @@ def get_user():
 
 
 @bp_user.route("/self", methods=["DELETE"])
-@jwt_required()
+@jwt_required(optional=True)
 def delete_user():
     session = current_app.db.session
 
