@@ -16,7 +16,7 @@ bp_register = Blueprint("register_view", __name__, url_prefix="/register")
 bp_login = Blueprint("login_view", __name__, url_prefix="/login")
 
 
-@bp_register.route("/", methods=["POST"])
+@bp_register.route("/", methods=["POST"], strict_slashes=False)
 def register():
     session = current_app.db.session
 
@@ -64,7 +64,7 @@ def register():
     }, HTTPStatus.CREATED
 
 
-@bp_login.route("/", methods=["POST"])
+@bp_login.route("/", methods=["POST"], strict_slashes=False)
 def login():
     res = request.get_json()
     email = res.get("email")
@@ -81,7 +81,7 @@ def login():
     return {"accessToken": access_token}, HTTPStatus.OK
 
 
-@bp_user.route("/self", methods=["GET"])
+@bp_user.route("/self", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def get_user():
 
@@ -133,13 +133,6 @@ def update_user():
     data = request.get_json()
 
     new_email = data.get("email")
-    new_password = data.get("password")
-
-    update_data = user_services.get_user_update_data(data)
-
-    if update_data:
-        UserModel.query.filter_by(id=user_id).update(update_data)
-
     if new_email:
         found_email = UserModel.query.filter_by(email=new_email).first()
 
@@ -148,10 +141,7 @@ def update_user():
                 "error": "This email address is already being used"
             }, HTTPStatus.CONFLICT
 
-        found_user.email = new_email
-
-    if new_password:
-        found_user.password = new_password
+    [setattr(found_user, key, value) for key, value in data.items()]
 
     session = current_app.db.session
     session.add(found_user)
@@ -168,7 +158,7 @@ def update_user():
     }, HTTPStatus.OK
 
 
-@bp_user.route("/", methods=["GET"])
+@bp_user.route("/", methods=["GET"], strict_slashes=False)
 def users_list():
     username_filter = request.args.get("nickname")
 

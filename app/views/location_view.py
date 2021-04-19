@@ -12,7 +12,7 @@ from app.models.location_model import LocationModel
 bp_location = Blueprint("location_view", __name__, url_prefix="/locations")
 
 
-@bp_location.route("/", methods=["POST"])
+@bp_location.route("/", methods=["POST"], strict_slashes=False)
 @jwt_required()
 def register_location():
     session = current_app.db.session
@@ -37,19 +37,38 @@ def register_location():
     }, HTTPStatus.CREATED
 
 
-@bp_location.route("/", methods=["GET"])
+@bp_location.route("/", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def list_locations():
-    return {"msg": "Teste list locations"}, HTTPStatus.OK
+    locations_query = LocationModel.query.all()
+
+    return {
+        "locations": [
+            {
+                "id": location.id,
+                "location_name": location.location_name,
+                "location_phone": location.location_phone,
+            }
+            for location in locations_query
+        ]
+    }, HTTPStatus.OK
 
 
-@bp_location.route("/get/", methods=["GET"])
+@bp_location.route("/<int:location_id>", methods=["GET"], strict_slashes=False)
 @jwt_required()
-def get_location():
-    return {"msg": "Teste get location"}, HTTPStatus.OK
+def get_location(location_id):
+
+    search_location = LocationModel.query.filter_by(id=location_id).first()
+
+    return {
+        "player_in_team": {
+            "location_name": search_location.location_name,
+            "location_phone": search_location.location_phone,
+        }
+    }, HTTPStatus.OK
 
 
-@bp_location.route("/", methods=["PATCH", "PUT"])
+@bp_location.route("/", methods=["PATCH", "PUT"], strict_slashes=False)
 @jwt_required()
 def update_location():
     return {"msg": "Teste update location"}, HTTPStatus.OK

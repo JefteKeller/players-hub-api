@@ -8,11 +8,22 @@ class MatchModel(db.Model):
     __tablename__ = "matches"
 
     id = db.Column(db.Integer, primary_key=True)
-    match_winner = db.Column(db.String, nullable=False)
     date = db.Column(db.String, nullable=False)
 
+    match_winner_id = db.Column(db.Integer, db.ForeignKey("teams.id"))
     team_id_1 = db.Column(db.Integer, db.ForeignKey("teams.id"))
     team_id_2 = db.Column(db.Integer, db.ForeignKey("teams.id"))
+
+    match_winner = db.relationship(
+        "TeamModel",
+        uselist=False,
+        lazy="joined",
+        backref=db.backref(
+            "match_winner",
+            lazy="joined",
+        ),
+        foreign_keys=[match_winner_id],
+    )
 
     team_1 = db.relationship(
         "TeamModel",

@@ -3,7 +3,7 @@ from flask.testing import FlaskClient
 
 def test_register_user(app_client: FlaskClient):
     response = app_client.post(
-        "/register",
+        "/register/",
         json={
             "nickname": "test",
             "first_name": "jj",

@@ -15,7 +15,7 @@ from app.models.team_game_model import TeamGameModel
 bp_game = Blueprint("game_view", __name__, url_prefix="/games")
 
 
-@bp_game.route("/", methods=["POST"])
+@bp_game.route("/", methods=["POST"], strict_slashes=False)
 @jwt_required()
 def register_game():
     session = current_app.db.session
@@ -44,7 +44,7 @@ def register_game():
     }, HTTPStatus.CREATED
 
 
-@bp_game.route("/<int:game_id>", methods=["POST"])
+@bp_game.route("/<int:game_id>", methods=["POST"], strict_slashes=False)
 @jwt_required()
 def register_team_in_game(game_id):
     session = current_app.db.session
@@ -69,19 +69,19 @@ def register_team_in_game(game_id):
     }, HTTPStatus.CREATED
 
 
-@bp_game.route("/", methods=["GET"])
+@bp_game.route("/", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def list_games():
     return {"msg": "Teste list games"}, HTTPStatus.OK
 
 
-@bp_game.route("/get/", methods=["GET"])
+@bp_game.route("/get/", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def get_game():
     return {"msg": "Teste get game"}, HTTPStatus.OK
 
 
-@bp_game.route("/", methods=["PATCH", "PUT"])
+@bp_game.route("/", methods=["PATCH"], strict_slashes=False)
 @jwt_required()
 def update_game():
     return {"msg": "Teste update game"}, HTTPStatus.OK
