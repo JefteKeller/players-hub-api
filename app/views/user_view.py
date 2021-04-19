@@ -105,7 +105,7 @@ def get_user():
 
 
 @bp_user.route("/self", methods=["DELETE"])
-@jwt_required(optional=True)
+@jwt_required()
 def delete_user():
     session = current_app.db.session
 

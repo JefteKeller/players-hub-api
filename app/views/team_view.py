@@ -1,3 +1,5 @@
+import http
+from flask.globals import session
 from app.models.user_model import UserModel
 from flask import Blueprint, request, current_app
 from flask_jwt_extended import (
@@ -130,3 +132,34 @@ def update_team():
             "team_create_date": found_team.team_created_date,
         }
     }, HTTPStatus.OK
+
+
+@bp_team.route("/", methods=["DELETE"])
+@jwt_required()
+def delete_team_user():
+    session = current_app.db.session
+    owner_id = get_jwt_identity()
+    body: dict = request.get_json()
+
+    found_user_team: TeamUserModel = TeamUserModel.query.filter_by(
+        owner_id=owner_id
+    ).first()
+    session.add(found_user_team)
+    session.commit()
+
+    return {"msg": found_user_team}, HTTPStatus.OK
+
+
+@bp_team.route("/self", methods=["DELETE"])
+@jwt_required(optional=True)
+def all_team_user():
+    session = current_app.db.session
+    res = request.get_json()
+    team_idt = res.get("team_id")
+    user_id = get_jwt_identity()
+
+    TeamUserModel.query.filter_by(user_id=user_id, team_id=team_idt).delete()
+
+    session.commit()
+
+    return {"msg": "Leave the team"}, HTTPStatus.OK
