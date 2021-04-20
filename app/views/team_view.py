@@ -1,5 +1,6 @@
 import http
 from flask.globals import session
+from app.models import team_model
 from app.models.user_model import UserModel
 from flask import Blueprint, request, current_app
 from flask_jwt_extended import (
@@ -134,22 +135,6 @@ def update_team():
     }, HTTPStatus.OK
 
 
-@bp_team.route("/", methods=["DELETE"])
-@jwt_required()
-def delete_team_user():
-    session = current_app.db.session
-    owner_id = get_jwt_identity()
-    body: dict = request.get_json()
-
-    found_user_team: TeamUserModel = TeamUserModel.query.filter_by(
-        owner_id=owner_id
-    ).first()
-    session.add(found_user_team)
-    session.commit()
-
-    return {"msg": found_user_team}, HTTPStatus.OK
-
-
 @bp_team.route("/self", methods=["DELETE"])
 @jwt_required()
 def all_team_user():
@@ -163,3 +148,30 @@ def all_team_user():
     session.commit()
 
     return {"msg": "Leave the team"}, HTTPStatus.OK
+
+
+@bp_team.route("/admin/<int:team_id>", methods=["DELETE"])
+@jwt_required()
+def owner_purge_user(team_id):
+    session = current_app.db.session
+
+    res = request.get_json()
+    user_idt = res.get("user_id")
+    owner_idt = get_jwt_identity()
+    try:
+        excluir_registro = TeamUserModel.query.filter(
+            TeamUserModel.team_id == team_id,
+            TeamUserModel.user_id == user_idt,
+            TeamModel.owner_id == owner_idt,
+        ).all()
+        if excluir_registro[0].team.owner_id == owner_idt:
+            session.delete(excluir_registro[0])
+            session.commit()
+
+            return {
+                f"O jogador {excluir_registro[0].user.nickname} foi expulso do time": f"{excluir_registro[0].team.team_name}",
+            }, HTTPStatus.OK
+        else:
+            return {"msg": "Você não é o dono do time"}, HTTPStatus.UNAUTHORIZED
+    except IndexError:
+        return {"msg": "no content"}, HTTPStatus.NO_CONTENT
