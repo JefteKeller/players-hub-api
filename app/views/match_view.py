@@ -72,7 +72,6 @@ def update_match(match_id):
     match_winner_id = sent_updated_match.get("match_winner_id")
     team_id_1 = sent_updated_match.get("team_id_1")
     team_id_2 = sent_updated_match.get("team_id_2")
-    game_id = sent_updated_match.get("game_id")
 
     match_to_update: MatchModel = MatchModel.query.filter_by(id=match_id).update(
         dict(
@@ -80,7 +79,6 @@ def update_match(match_id):
             match_winner_id=match_winner_id,
             team_id_1=team_id_1,
             team_id_2=team_id_2,
-            game_id=game_id,
         )
     )
 
