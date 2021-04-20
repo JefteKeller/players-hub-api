@@ -66,7 +66,19 @@ def list_games():
 @jwt_required()
 def get_game(game_id):
 
-    return {"msg": "Teste get game"}, HTTPStatus.OK
+    found_game: GameModel = GameModel.query.get(game_id)
+
+    if not found_game:
+        return {"msg": "Enter a valid game ID"}, HTTPStatus.BAD_REQUEST
+
+    return {
+        "game": {
+            "id": found_game.id,
+            "game_name": found_game.game_name,
+            "game_type": found_game.game_type,
+            "game_description": found_game.game_description,
+        }
+    }, HTTPStatus.OK
 
 
 @bp_game.route("/", methods=["PATCH"], strict_slashes=False)
