@@ -1,5 +1,5 @@
-from sqlalchemy.orm import backref
-from werkzeug.security import generate_password_hash, check_password_hash
+# // Disabling errors of ORM type due to how SQLAlchemy works
+# type: ignore
 
 from . import db
 
@@ -11,15 +11,3 @@ class GameModel(db.Model):
     game_name = db.Column(db.String, nullable=False)
     game_type = db.Column(db.String, nullable=False)
     game_description = db.Column(db.String, nullable=False)
-
-    profile_id = db.Column(db.Integer, db.ForeignKey("profiles.id"))
-    profile = db.relationship(
-        "ProfileModel",
-        uselist=False,
-        lazy="joined",
-        backref=db.backref(
-            "user",
-            lazy="joined",
-        ),
-    )
-

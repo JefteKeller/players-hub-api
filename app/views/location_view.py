@@ -1,7 +1,5 @@
 from flask import Blueprint, request, current_app
 from flask_jwt_extended import (
-    create_access_token,
-    create_refresh_token,
     jwt_required,
     get_jwt_identity,
 )
@@ -13,23 +11,89 @@ from app.models.location_model import LocationModel
 
 bp_location = Blueprint("location_view", __name__, url_prefix="/locations")
 
-@bp_location.route("/", methods=["POST"])
+
+@bp_location.route("/", methods=["POST"], strict_slashes=False)
 @jwt_required()
 def register_location():
-    return {"msg": "Teste register location"}, HTTPStatus.OK
+    session = current_app.db.session
 
-@bp_location.route("/", methods=["GET"])
+    res = request.get_json()
+    location_name = res.get("location_name")
+    location_phone = res.get("location_phone")
+
+    new_location = LocationModel(
+        location_name=location_name, location_phone=location_phone
+    )
+
+    session.add(new_location)
+
+    session.commit()
+
+    return {
+        "location": {
+            "location_name": new_location.location_name,
+            "location_phone": new_location.location_phone,
+        }
+    }, HTTPStatus.CREATED
+
+
+@bp_location.route("/", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def list_locations():
-    return {"msg": "Teste list locations"}, HTTPStatus.OK
+    locations_query = LocationModel.query.all()
 
-@bp_location.route("/get/", methods=["GET"])
+    return {
+        "locations": [
+            {
+                "id": location.id,
+                "location_name": location.location_name,
+                "location_phone": location.location_phone,
+            }
+            for location in locations_query
+        ]
+    }, HTTPStatus.OK
+
+
+@bp_location.route("/<int:location_id>", methods=["GET"], strict_slashes=False)
 @jwt_required()
-def get_location():
-    return {"msg": "Teste get location"}, HTTPStatus.OK
+def get_location(location_id):
+
+    search_location = LocationModel.query.filter_by(id=location_id).first()
+
+    return {
+        "player_in_team": {
+            "location_name": search_location.location_name,
+            "location_phone": search_location.location_phone,
+        }
+    }, HTTPStatus.OK
 
 
-@bp_location.route("/", methods=["PATCH", "PUT"])
+@bp_location.route("/<int:location_id>", methods=["PATCH"], strict_slashes=False)
 @jwt_required()
-def update_location():
-    return {"msg": "Teste update location"}, HTTPStatus.OK
+def update_location(location_id):
+    session = current_app.db.session
+
+    data = request.get_json()
+
+    location_name = data.get("location_name")
+    location_phone = data.get("location_phone")
+
+    location_to_update: LocationModel = LocationModel.query.filter_by(
+        id=location_id
+    ).update(dict(location_name=location_name, location_phone=location_phone))
+
+    if not location_to_update:
+        return {"error": "Location not found"}, HTTPStatus.NOT_FOUND
+
+    location_updated = LocationModel(
+        location_name=location_name, location_phone=location_phone
+    )
+
+    session.commit()
+
+    return {
+        "location": {
+            "location_name": location_updated.location_name,
+            "location_phone": location_updated.location_phone,
+        }
+    }, HTTPStatus.OK
