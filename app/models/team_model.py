@@ -1,4 +1,7 @@
-from sqlalchemy.orm import backref
+# // Disabling errors of ORM type due to how SQLAlchemy works
+# type: ignore
+
+from datetime import datetime
 
 from . import db
 
@@ -9,9 +12,10 @@ class TeamModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     team_name = db.Column(db.String, nullable=False)
     team_description = db.Column(db.String, nullable=False)
+    team_created_date = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    user = db.relationship(
+    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    owner = db.relationship(
         "UserModel",
         uselist=False,
         lazy="joined",

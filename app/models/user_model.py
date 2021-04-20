@@ -1,5 +1,7 @@
-from sqlalchemy.orm import backref
+# // Disabling errors of ORM type due to how SQLAlchemy works
+# type: ignore
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 from . import db
 
@@ -14,6 +16,7 @@ class UserModel(db.Model):
     email = db.Column(db.String, nullable=False, unique=True)
     password_hash = db.Column(db.String, nullable=False)
     biography = db.Column(db.String, nullable=True)
+    created_at = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
 
     @property
     def password(self):

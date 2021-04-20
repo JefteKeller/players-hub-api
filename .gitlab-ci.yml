@@ -1,0 +1,43 @@
+variables:
+    POSTGRES_DB: test_players_hub
+    POSTGRES_USER: test_keller
+    POSTGRES_PASSWORD: "test_4456"
+    POSTGRES_HOST_AUTH_METHOD: trust
+
+services:
+    - name: postgres:12.6
+      alias: db-postgres
+
+image: python:3.9.4
+
+stages:
+    - testing
+    - formatting
+
+before_script:
+    - python -V
+    - python -m pip install -U pip
+    - python -m pip install -r requirements.txt
+
+Tests:
+    stage: testing
+    variables:
+        FLASK_RUN_PORT: 4444
+        JWT_SECRET_KEY: "test_a7f828f6ff20e3481f5298ae977de69e0ece4c95afde7257e42726c6e08c425f"
+
+        JSON_SORT_KEYS: "False"
+        SQLALCHEMY_TRACK_MODIFICATIONS: "False"
+        DATABASE_URL: ""
+
+        DB_URI_TEST: "postgresql://test_keller:test_4456@postgres:5432/test_players_hub"
+        DB_URI_DEV: ""
+        DB_URI_PROD: ""
+
+    script:
+        - python -m pytest -svv
+
+Formatting Checks:
+    stage: formatting
+    variables: {}
+    script:
+        - python -m black --check .
