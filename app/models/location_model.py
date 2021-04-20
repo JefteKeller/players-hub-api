@@ -8,5 +8,5 @@ class LocationModel(db.Model):
     __tablename__ = "locations"
 
     id = db.Column(db.Integer, primary_key=True)
-    location_name = db.Column(db.String, nullable=False)
+    location_name = db.Column(db.String, nullable=False, unique=True)
     location_phone = db.Column(db.String, nullable=False)

@@ -1,8 +1,5 @@
 from flask import Blueprint, request, current_app
-from flask_jwt_extended import (
-    jwt_required,
-    get_jwt_identity,
-)
+from flask_jwt_extended import jwt_required
 from http import HTTPStatus
 from datetime import timedelta
 
@@ -49,7 +46,7 @@ def list_matches():
     res = []
 
     for match in match_list:
-        res.append(match_serializer(match.id))
+        res.append(match_serializer(match))
 
     return {"matches": res}, HTTPStatus.OK
 
@@ -57,12 +54,40 @@ def list_matches():
 @bp_match.route("/<int:match_id>", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def get_match(match_id):
-    match = match_serializer(match_id)
+    match: MatchModel = MatchModel.query.get(match_id)
 
-    return {"match": match}, HTTPStatus.OK
+    match_return = match_serializer(match)
+
+    return {"match": match_return}, HTTPStatus.OK
 
 
-@bp_match.route("/", methods=["PATCH"], strict_slashes=False)
+@bp_match.route("/<int:match_id>", methods=["PATCH"], strict_slashes=False)
 @jwt_required()
-def update_match():
-    return {"msg": "Teste update match"}, HTTPStatus.OK
+def update_match(match_id):
+    session = current_app.db.session
+
+    sent_updated_match = request.get_json()
+
+    date = sent_updated_match.get("date")
+    match_winner_id = sent_updated_match.get("match_winner_id")
+    team_id_1 = sent_updated_match.get("team_id_1")
+    team_id_2 = sent_updated_match.get("team_id_2")
+
+    match_to_update: MatchModel = MatchModel.query.filter_by(id=match_id).update(
+        dict(
+            date=date,
+            match_winner_id=match_winner_id,
+            team_id_1=team_id_1,
+            team_id_2=team_id_2,
+        )
+    )
+
+    if not match_to_update:
+        return {"error": "Match not found"}, HTTPStatus.NOT_FOUND
+
+    session.commit()
+
+    match: MatchModel = MatchModel.query.get(match_id)
+    match_return = match_serializer(match)
+
+    return {"match": match_return}, HTTPStatus.OK

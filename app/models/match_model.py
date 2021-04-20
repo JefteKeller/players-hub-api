@@ -2,6 +2,7 @@
 # type: ignore
 
 from . import db
+from datetime import datetime
 
 
 class MatchModel(db.Model):
@@ -9,6 +10,7 @@ class MatchModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.String, nullable=False)
+    match_register_date = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
 
     match_winner_id = db.Column(db.Integer, db.ForeignKey("teams.id"))
     team_id_1 = db.Column(db.Integer, db.ForeignKey("teams.id"))
