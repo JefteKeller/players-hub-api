@@ -35,6 +35,14 @@ populate_users = [
         "password": "senh@123",
         "biography": fake.text()[:100],
     },
+    {
+        "nickname": "TheFlash",
+        "first_name": "João",
+        "last_name": "Zika",
+        "email": "JZika@yahoo.com",
+        "password": "senh@123",
+        "biography": fake.text()[:100],
+    },
 ]
 
 populate_teams = [
@@ -57,6 +65,11 @@ populate_teams = [
         "team_name": "Fogo no Parquinho",
         "team_description": fake.text()[:50],
         "owner_id": 4,
+    },
+    {
+        "team_name": "Heroes of Marvel",
+        "team_description": fake.text()[:50],
+        "owner_id": 5,
     },
 ]
 
@@ -127,6 +140,14 @@ populate_matches = [
         "game_id": 1,
         "location_id": 3,
     },
+    {
+        "match_winner_id": 5,
+        "team_id_1": 1,
+        "team_id_2": 5,
+        "date": "05/09/21",
+        "game_id": 1,
+        "location_id": 3,
+    },
 ]
 
 populate_locations = [
@@ -148,6 +169,10 @@ populate_teams_users = [
     {
         "user_id": 1,
         "team_id": 2,
+    },
+    {
+        "user_id": 1,
+        "team_id": 5,
     },
     {
         "user_id": 3,
