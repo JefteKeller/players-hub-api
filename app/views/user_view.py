@@ -9,6 +9,9 @@ from http import HTTPStatus
 from datetime import timedelta
 
 from app.models.user_model import UserModel
+from app.models.team_model import TeamModel
+from app.models.team_user_model import TeamUserModel
+from app.models.match_model import MatchModel
 from app.services import user_services
 
 
@@ -184,4 +187,63 @@ def users_list():
             }
             for user in list_of_users
         ]
+    }, HTTPStatus.OK
+
+
+@bp_user.route("/<int:user_id>/history", methods=["GET"], strict_slashes=False)
+@jwt_required()
+def users_history(user_id):
+    user_data: UserModel = UserModel.query.filter_by(id=user_id).first()
+
+    if not user_data:
+        return {"msg": f"There is not any user with id {user_id}"}, HTTPStatus.NOT_FOUND
+
+    nickname = user_data.nickname
+    victories = 0
+    losses = 0
+
+    user_teams_search = TeamUserModel.query.filter_by(user_id=user_id).all()
+    user_teams_id = []
+    user_teams_names = []
+
+    for user_team in user_teams_search:
+        user_teams_id.append(user_team.team_id)
+        user_teams_names.append(
+            TeamModel.query.filter_by(id=user_team.team_id).first().team_name
+        )
+
+    all_user_matches = []
+
+    for user_team_id in user_teams_id:
+        current_matches_analises = MatchModel.query.filter_by(
+            team_id_1=user_team_id
+        ).all()
+        for match in current_matches_analises:
+            if match.match_winner_id == user_team_id:
+                victories += 1
+            else:
+                losses += 1
+
+        all_user_matches = [*all_user_matches, *current_matches_analises]
+
+        current_matches_analises = MatchModel.query.filter_by(
+            team_id_2=user_team_id
+        ).all()
+
+        for match in current_matches_analises:
+            if match.match_winner_id == user_team_id:
+                victories += 1
+            else:
+                losses += 1
+
+        all_user_matches = [*all_user_matches, *current_matches_analises]
+
+    return {
+        "user_history": {
+            "nickname": nickname,
+            "user_teams": user_teams_names,
+            "total_matches": victories + losses,
+            "victories": victories,
+            "losses": losses,
+        }
     }, HTTPStatus.OK
