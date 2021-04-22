@@ -175,3 +175,24 @@ def owner_purge_user(team_id):
             return {"msg": "Você não é o dono do time"}, HTTPStatus.UNAUTHORIZED
     except IndexError:
         return {"msg": "no content"}, HTTPStatus.NO_CONTENT
+
+
+@bp_team.route("/self/<int:team_id>", methods=["DELETE"])
+@jwt_required()
+def delete_team(team_id):
+
+    session = current_app.db.session
+
+    owner_id = get_jwt_identity()
+
+    team_to_be_deleted: TeamModel = TeamModel.query.filter_by(
+        owner_id=owner_id, id=team_id
+    ).first()
+
+    if not team_to_be_deleted:
+        return {"msg": "Insert ID team correct"}, HTTPStatus.BAD_REQUEST
+
+    session.delete(team_to_be_deleted)
+    session.commit()
+
+    return {"msg": "Deleted team"}, HTTPStatus.OK
