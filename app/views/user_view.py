@@ -247,3 +247,27 @@ def users_history(user_id):
             "losses": losses,
         }
     }, HTTPStatus.OK
+
+
+@bp_user.route("/about", methods=["GET"])
+@jwt_required()
+def owner_teams():
+
+    owner_id = get_jwt_identity()
+
+    teams_of_owner: TeamModel = TeamModel.query.filter_by(owner_id=owner_id).all()
+
+    if not teams_of_owner:
+        return {"message": "The user does not own any team"}, HTTPStatus.OK
+
+    return {
+        "teams": [
+            {
+                "id": team.id,
+                "team_name": team.team_name,
+                "team_description": team.team_description,
+                "team_created_date": team.team_created_date,
+            }
+            for team in teams_of_owner
+        ]
+    }, HTTPStatus.OK
