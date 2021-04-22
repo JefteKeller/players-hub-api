@@ -12,6 +12,7 @@ from datetime import timedelta
 
 from app.models.team_model import TeamModel
 from app.models.team_user_model import TeamUserModel
+from app.models.invite_user_model import InviteUserModel
 
 
 bp_team = Blueprint("team_view", __name__, url_prefix="/teams")
@@ -41,34 +42,6 @@ def register_team():
             "team_description": new_team.team_description,
             "owner_id": new_team.owner_id,
             "team_created_date": new_team.team_created_date,
-        }
-    }, HTTPStatus.CREATED
-
-
-@bp_team.route("/<int:team_id>", methods=["POST"], strict_slashes=False)
-@jwt_required()
-def register_player_in_team(team_id):
-    session = current_app.db.session
-    res = request.get_json()
-    user_id = res.get("user_id")
-    owner_id = get_jwt_identity()
-
-    verify_team_owner = TeamModel.query.filter_by(owner_id=owner_id).first()
-
-    if not verify_team_owner:
-        return {"msg": "You are not the team's owner!"}, HTTPStatus.FORBIDDEN
-
-    new_player_in_team = TeamUserModel(user_id=user_id, team_id=team_id)
-
-    session.add(new_player_in_team)
-
-    session.commit()
-
-    return {
-        "player_in_team": {
-            "user_id": new_player_in_team.user_id,
-            "team_id": new_player_in_team.team_id,
-            "owner_id": owner_id,
         }
     }, HTTPStatus.CREATED
 
