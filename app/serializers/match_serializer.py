@@ -1,8 +1,7 @@
 from app.models.match_model import MatchModel
 
 
-def match_serializer(match_id):
-    match: MatchModel = MatchModel.query.get(match_id)
+def match_serializer(match):
 
     return {
         "game": match.game.game_name,
