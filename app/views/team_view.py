@@ -1,4 +1,5 @@
-import http
+from app.models.match_model import MatchModel
+from sqlalchemy import or_
 from flask.globals import session
 from app.models import team_model
 from app.models.user_model import UserModel
@@ -175,3 +176,39 @@ def owner_purge_user(team_id):
             return {"msg": "Você não é o dono do time"}, HTTPStatus.UNAUTHORIZED
     except IndexError:
         return {"msg": "no content"}, HTTPStatus.NO_CONTENT
+
+
+@bp_team.route("/<int:team_id>/history", methods=["GET"])
+def team_match_history(team_id):
+    team_history = MatchModel.query.filter(
+        or_(MatchModel.team_id_1 == team_id, MatchModel.team_id_2 == team_id)
+    ).all()
+
+    return {
+        "Matches": [
+            {
+                "Match ID": info.id,
+                "Match date": info.date,
+                "Match winner": info.match_winner.team_name,
+                "Team 1 ": [
+                    {
+                        "Team name": info.team_name,
+                        "Team description": info.team_description,
+                        "Data de criação do time": info.team_created_date,
+                        "Team ID": info.id,
+                    }
+                    for info in info.team_1
+                ],
+                "Team 2 ": [
+                    {
+                        "Team name": info.team_name,
+                        "Team description": info.team_description,
+                        "Data de criação do time": info.team_created_date,
+                        "Team ID": info.id,
+                    }
+                    for info in info.team_2
+                ],
+            }
+            for info in team_history
+        ]
+    }
