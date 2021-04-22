@@ -249,27 +249,41 @@ def users_history(user_id):
     }, HTTPStatus.OK
 
 
-@bp_user.route("/about", methods=["GET"])
-@jwt_required()
-def owner_teams():
+@bp_user.route("/<int:user_id>/about", methods=["GET"])
+def user_info(user_id):
 
-    owner_id = get_jwt_identity()
+    user_data: UserModel = UserModel.query.filter_by(id=user_id).first()
 
-    teams_of_owner: TeamModel = TeamModel.query.filter_by(owner_id=owner_id).all()
+    if not user_data:
+        return {"error": "Invalid user ID"}, HTTPStatus.NOT_FOUND
 
-    if not teams_of_owner:
-        return {"message": "The user does not own any team"}, HTTPStatus.BAD_REQUEST
+    user_info = {
+        "nickname": user_data.nickname,
+        "first_name": user_data.first_name,
+        "last_name": user_data.last_name,
+        "biography": user_data.biography,
+        "created_at": user_data.created_at,
+    }
+    owner_of_teams = [
+        {
+            "team_name": team.team_name,
+            "team_description": team.team_description,
+            "team_created_date": team.team_created_date,
+        }
+        for team in user_data.team
+    ]
+
+    player_of_teams = [
+        {
+            "team_name": user.team.team_name,
+            "team_description": user.team.team_description,
+            "team_created_date": user.team.team_created_date,
+        }
+        for user in user_data.user
+    ]
 
     return {
-        "teams": [
-            {
-                "id": team.id,
-                "team_name": team.team_name,
-                "team_description": team.team_description,
-                "team_created_date": team.team_created_date,
-            }
-            for team in teams_of_owner
-        ]
+        "user_info": user_info,
+        "owner_of_teams": owner_of_teams,
+        "player_of_teams": player_of_teams,
     }, HTTPStatus.OK
-
-@bp_user.route("")

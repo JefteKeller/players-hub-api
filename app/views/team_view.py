@@ -190,7 +190,7 @@ def delete_team(team_id):
     ).first()
 
     if not team_to_be_deleted:
-        return {"msg": "Insert ID team correct"}, HTTPStatus.BAD_REQUEST
+        return {"msg": "Invalid team ID"}, HTTPStatus.NOT_FOUND
 
     session.delete(team_to_be_deleted)
     session.commit()
