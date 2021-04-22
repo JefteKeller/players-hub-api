@@ -29,7 +29,7 @@ class MatchModel(db.Model):
 
     team_1 = db.relationship(
         "TeamModel",
-        uselist=False,
+        uselist=True,
         lazy="joined",
         backref=db.backref(
             "match_team_1",
@@ -40,7 +40,7 @@ class MatchModel(db.Model):
 
     team_2 = db.relationship(
         "TeamModel",
-        uselist=False,
+        uselist=True,
         lazy="joined",
         backref=db.backref(
             "match_team_2",
