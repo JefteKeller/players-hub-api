@@ -1,3 +1,5 @@
+from threading import settrace
+from app.models.team_model import TeamModel
 from flask import Blueprint, request, current_app
 from flask_jwt_extended import (
     create_access_token,
@@ -81,7 +83,30 @@ def get_game(game_id):
     }, HTTPStatus.OK
 
 
-@bp_game.route("/", methods=["PATCH"], strict_slashes=False)
+@bp_game.route("/<int:game_id>", methods=["PATCH"], strict_slashes=False)
 @jwt_required()
-def update_game():
-    return {"msg": "Teste update game"}, HTTPStatus.OK
+def update_game(game_id):
+
+    session = current_app.db.session
+
+    body: dict = request.get_json()
+
+    found_game: GameModel = GameModel.query.filter_by(id=game_id).first()
+
+    if not found_game:
+        return {"msg": "Insert a valid game ID"}
+
+    for key, value in body.items():
+        setattr(found_game, key, value)
+
+    session.add(found_game)
+    session.commit()
+
+    return {
+        "game": {
+            "id": found_game.id,
+            "game_name": found_game.game_name,
+            "game_type": found_game.game_type,
+            "game_description": found_game.game_description,
+        }
+    }, HTTPStatus.OK
