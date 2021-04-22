@@ -12,6 +12,7 @@ from app.models.user_model import UserModel
 from app.models.team_model import TeamModel
 from app.models.team_user_model import TeamUserModel
 from app.models.match_model import MatchModel
+from app.models.invite_user_model import InviteUserModel
 from app.services import user_services
 
 
