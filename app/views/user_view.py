@@ -258,7 +258,7 @@ def owner_teams():
     teams_of_owner: TeamModel = TeamModel.query.filter_by(owner_id=owner_id).all()
 
     if not teams_of_owner:
-        return {"message": "The user does not own any team"}, HTTPStatus.OK
+        return {"message": "The user does not own any team"}, HTTPStatus.BAD_REQUEST
 
     return {
         "teams": [
@@ -271,3 +271,5 @@ def owner_teams():
             for team in teams_of_owner
         ]
     }, HTTPStatus.OK
+
+@bp_user.route("")
