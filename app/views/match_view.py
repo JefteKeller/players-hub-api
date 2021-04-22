@@ -34,7 +34,7 @@ def register_match():
 
     session.commit()
 
-    match = match_serializer(new_match.id)
+    match = match_serializer(new_match)
 
     return match, HTTPStatus.CREATED
 
