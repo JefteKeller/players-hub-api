@@ -61,7 +61,7 @@ def get_location(location_id):
     search_location = LocationModel.query.filter_by(id=location_id).first()
 
     return {
-        "Player_in_team": {
+        "Location": {
             "location_name": search_location.location_name,
             "location_phone": search_location.location_phone,
         }
@@ -83,7 +83,7 @@ def update_location(location_id):
     ).update(dict(location_name=location_name, location_phone=location_phone))
 
     if not location_to_update:
-        return {"Error": "Location not found"}, HTTPStatus.NOT_FOUND
+        return {"error": "Location not found"}, HTTPStatus.NOT_FOUND
 
     location_updated = LocationModel(
         location_name=location_name, location_phone=location_phone
@@ -92,7 +92,7 @@ def update_location(location_id):
     session.commit()
 
     return {
-        "Location": {
+        "location": {
             "location_name": location_updated.location_name,
             "location_phone": location_updated.location_phone,
         }
