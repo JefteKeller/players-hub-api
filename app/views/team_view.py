@@ -81,9 +81,9 @@ def get_team(team_id):
     return {"error": "Team not found"}, HTTPStatus.NOT_FOUND
 
 
-@bp_team.route("/", methods=["PATCH"], strict_slashes=False)
+@bp_team.route("/<int:team_id>", methods=["PATCH"], strict_slashes=False)
 @jwt_required()
-def update_team():
+def update_team(team_id):
 
     session = current_app.db.session
 
@@ -91,7 +91,15 @@ def update_team():
 
     body: dict = request.get_json()
 
-    found_team: TeamModel = TeamModel.query.filter_by(owner_id=owner_id).first()
+    found_team: TeamModel = TeamModel.query.filter_by(id=team_id).first()
+
+    if not found_team:
+        return {
+            "error": "Not found any team that matches the requested ID."
+        }, HTTPStatus.NOT_FOUND
+
+    if found_team.owner_id != owner_id:
+        return {"error": "You are not the owner of this Team."}, HTTPStatus.FORBIDDEN
 
     for key, value in body.items():
         setattr(found_team, key, value)
@@ -203,4 +211,4 @@ def delete_team(team_id):
     session.delete(team_to_be_deleted)
     session.commit()
 
-    return {"error": "Deleted team"}, HTTPStatus.OK
+    return {"message": f"Deleted team with ID: {team_id}"}, HTTPStatus.OK
