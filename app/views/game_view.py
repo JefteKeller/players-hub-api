@@ -64,14 +64,14 @@ def list_games():
     }, HTTPStatus.OK
 
 
-@bp_game.route("/get/<int:game_id>", methods=["GET"], strict_slashes=False)
+@bp_game.route("/<int:game_id>", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def get_game(game_id):
 
     found_game: GameModel = GameModel.query.get(game_id)
 
     if not found_game:
-        return {"msg": "Enter a valid game ID"}, HTTPStatus.BAD_REQUEST
+        return {"message": "Enter a valid game ID"}, HTTPStatus.BAD_REQUEST
 
     return {
         "game": {
@@ -94,7 +94,7 @@ def update_game(game_id):
     found_game: GameModel = GameModel.query.filter_by(id=game_id).first()
 
     if not found_game:
-        return {"msg": "Insert a valid game ID"}
+        return {"message": "Insert a valid game ID"}
 
     for key, value in body.items():
         setattr(found_game, key, value)
