@@ -121,7 +121,7 @@ def leave_team():
 
     session.commit()
 
-    return {"Message": "Leave the team"}, HTTPStatus.OK
+    return {"Message": "Leave team"}, HTTPStatus.OK
 
 
 @bp_team.route("/admin/<int:team_id>", methods=["DELETE"])
