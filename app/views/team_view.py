@@ -163,24 +163,18 @@ def team_match_history(team_id):
                 "Match ID": info.id,
                 "Match date": info.date,
                 "Match winner": info.match_winner.team_name,
-                "Team 1 ": [
-                    {
-                        "Team name": info.team_name,
-                        "Team description": info.team_description,
-                        "Data de criação do time": info.team_created_date,
-                        "Team ID": info.id,
-                    }
-                    for info in info.team_1
-                ],
-                "Team 2 ": [
-                    {
-                        "Team name": info.team_name,
-                        "Team description": info.team_description,
-                        "Data de criação do time": info.team_created_date,
-                        "Team ID": info.id,
-                    }
-                    for info in info.team_2
-                ],
+                "Team 1 ": {
+                    "Team name": info.team_1.team_name,
+                    "Team description": info.team_1.team_description,
+                    "Data de criação do time": info.team_1.team_created_date,
+                    "Team ID": info.team_1.id,
+                },
+                "Team 2 ": {
+                    "Team name": info.team_2.team_name,
+                    "Team description": info.team_2.team_description,
+                    "Data de criação do time": info.team_2.team_created_date,
+                    "Team ID": info.team_2.id,
+                },
             }
             for info in team_history
         ]
