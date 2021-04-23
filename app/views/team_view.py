@@ -132,23 +132,25 @@ def owner_purge_user(team_id):
     res = request.get_json()
     user_idt = res.get("user_id")
     owner_idt = get_jwt_identity()
+
+    excluir_registro = TeamUserModel.query.filter(
+        TeamUserModel.team_id == team_id,
+        TeamUserModel.user_id == user_idt,
+        TeamModel.owner_id == owner_idt,
+    ).first()
+
     try:
-        excluir_registro = TeamUserModel.query.filter(
-            TeamUserModel.team_id == team_id,
-            TeamUserModel.user_id == user_idt,
-            TeamModel.owner_id == owner_idt,
-        ).all()
-        if excluir_registro[0].team.owner_id == owner_idt:
-            session.delete(excluir_registro[0])
+        if excluir_registro.team.owner_id == owner_idt:
+            session.delete(excluir_registro)
             session.commit()
 
             return {
-                f"O jogador {excluir_registro[0].user.nickname} foi expulso do time": f"{excluir_registro[0].team.team_name}",
+                f"O jogador {excluir_registro.user.nickname} foi expulso do time": f"{excluir_registro.team.team_name}",
             }, HTTPStatus.OK
         else:
-            return {"msg": "Você não é o dono do time"}, HTTPStatus.UNAUTHORIZED
-    except IndexError:
-        return {"msg": "no content"}, HTTPStatus.NO_CONTENT
+            return {"Error": "Você não é o dono do time"}, HTTPStatus.UNAUTHORIZED
+    except AttributeError:
+        return {"Error": "Team id or user id incorrects."}, HTTPStatus.NOT_FOUND
 
 
 @bp_team.route("/<int:team_id>/history", methods=["GET"])
