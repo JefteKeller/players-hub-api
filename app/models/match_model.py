@@ -16,13 +16,16 @@ class MatchModel(db.Model):
     team_id_1 = db.Column(db.Integer, db.ForeignKey("teams.id"))
     team_id_2 = db.Column(db.Integer, db.ForeignKey("teams.id"))
 
+    game_id = db.Column(db.Integer, db.ForeignKey("games.id"))
+    location_id = db.Column(db.Integer, db.ForeignKey("locations.id"))
+
     match_winner = db.relationship(
         "TeamModel",
         uselist=False,
-        lazy="joined",
+        lazy="select",
         backref=db.backref(
             "match_winner",
-            lazy="joined",
+            lazy="select",
         ),
         foreign_keys=[match_winner_id],
     )
@@ -30,10 +33,10 @@ class MatchModel(db.Model):
     team_1 = db.relationship(
         "TeamModel",
         uselist=False,
-        lazy="joined",
+        lazy="select",
         backref=db.backref(
             "match_team_1",
-            lazy="joined",
+            lazy="select",
         ),
         foreign_keys=[team_id_1],
     )
@@ -41,32 +44,30 @@ class MatchModel(db.Model):
     team_2 = db.relationship(
         "TeamModel",
         uselist=False,
-        lazy="joined",
+        lazy="select",
         backref=db.backref(
             "match_team_2",
-            lazy="joined",
+            lazy="select",
         ),
         foreign_keys=[team_id_2],
     )
 
-    game_id = db.Column(db.Integer, db.ForeignKey("games.id"))
     game = db.relationship(
         "GameModel",
         uselist=False,
-        lazy="joined",
+        lazy="select",
         backref=db.backref(
             "match",
-            lazy="joined",
+            lazy="select",
         ),
     )
 
-    location_id = db.Column(db.Integer, db.ForeignKey("locations.id"))
     location = db.relationship(
         "LocationModel",
         uselist=False,
-        lazy="joined",
+        lazy="select",
         backref=db.backref(
             "match",
-            lazy="joined",
+            lazy="select",
         ),
     )

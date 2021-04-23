@@ -7,11 +7,13 @@ from flask_jwt_extended import (
 )
 from http import HTTPStatus
 from datetime import timedelta
+from sqlalchemy import or_
 
 from app.models.user_model import UserModel
 from app.models.team_model import TeamModel
 from app.models.team_user_model import TeamUserModel
 from app.models.match_model import MatchModel
+
 from app.services import user_services
 
 
@@ -36,7 +38,7 @@ def register():
     verify_user: UserModel = UserModel.query.filter_by(email=email).first()
 
     if verify_user:
-        return {"msg": f"{email} already exists"}, HTTPStatus.FORBIDDEN
+        return {"error": f"{email} already exists"}, HTTPStatus.FORBIDDEN
 
     new_user = UserModel(
         nickname=nickname,
@@ -77,7 +79,7 @@ def login():
     found_user: UserModel = UserModel.query.filter_by(email=email).first()
 
     if not found_user or not found_user.check_password(password):
-        return {"msg": "Incorrect user or password"}, HTTPStatus.UNAUTHORIZED
+        return {"error": "Incorrect user or password"}, HTTPStatus.UNAUTHORIZED
 
     access_token = create_access_token(
         identity=found_user.id, expires_delta=timedelta(days=7)
@@ -93,7 +95,7 @@ def get_user():
     logged_user: UserModel = UserModel.query.filter_by(id=user_id).first()
 
     if not logged_user:
-        return {"msg": "You are not logged in!"}, HTTPStatus.NOT_FOUND
+        return {"error": "You are not logged in!"}, HTTPStatus.NOT_FOUND
 
     return {
         "user": {
@@ -116,12 +118,12 @@ def delete_user():
     user_to_be_deleted: UserModel = UserModel.query.filter_by(id=user_id).first()
 
     if not user_to_be_deleted:
-        return {"msg": f"You are not logged in!"}, HTTPStatus.NOT_FOUND
+        return {"error": f"You are not logged in!"}, HTTPStatus.NOT_FOUND
 
     session.delete(user_to_be_deleted)
     session.commit()
 
-    return {"msg": f"{user_to_be_deleted.email} deleted"}, HTTPStatus.OK
+    return {"message": f"{user_to_be_deleted.email} deleted"}, HTTPStatus.OK
 
 
 @bp_user.route("/", methods=["PATCH"], strict_slashes=False)
@@ -196,47 +198,26 @@ def users_history(user_id):
     user_data: UserModel = UserModel.query.filter_by(id=user_id).first()
 
     if not user_data:
-        return {"msg": f"There is not any user with id {user_id}"}, HTTPStatus.NOT_FOUND
+        return {
+            "error": f"There is not any user with id {user_id}"
+        }, HTTPStatus.NOT_FOUND
 
     nickname = user_data.nickname
     victories = 0
     losses = 0
 
-    user_teams_search = TeamUserModel.query.filter_by(user_id=user_id).all()
-    user_teams_id = []
-    user_teams_names = []
+    user_teams_id = [user_team.team.id for user_team in user_data.user]
+    user_teams_names = [user_team.team.team_name for user_team in user_data.user]
 
-    for user_team in user_teams_search:
-        user_teams_id.append(user_team.team_id)
-        user_teams_names.append(
-            TeamModel.query.filter_by(id=user_team.team_id).first().team_name
-        )
-
-    all_user_matches = []
+    all_matches = MatchModel.query.all()
 
     for user_team_id in user_teams_id:
-        current_matches_analises = MatchModel.query.filter_by(
-            team_id_1=user_team_id
-        ).all()
-        for match in current_matches_analises:
-            if match.match_winner_id == user_team_id:
-                victories += 1
-            else:
-                losses += 1
-
-        all_user_matches = [*all_user_matches, *current_matches_analises]
-
-        current_matches_analises = MatchModel.query.filter_by(
-            team_id_2=user_team_id
-        ).all()
-
-        for match in current_matches_analises:
-            if match.match_winner_id == user_team_id:
-                victories += 1
-            else:
-                losses += 1
-
-        all_user_matches = [*all_user_matches, *current_matches_analises]
+        for match in all_matches:
+            if match.team_id_1 == user_team_id or match.team_id_2 == user_team_id:
+                if match.match_winner_id == user_team_id:
+                    victories += 1
+                else:
+                    losses += 1
 
     return {
         "user_history": {
@@ -246,4 +227,44 @@ def users_history(user_id):
             "victories": victories,
             "losses": losses,
         }
+    }, HTTPStatus.OK
+
+
+@bp_user.route("/<int:user_id>/about", methods=["GET"])
+def user_info(user_id):
+
+    user_data: UserModel = UserModel.query.filter_by(id=user_id).first()
+
+    if not user_data:
+        return {"error": "Invalid user ID"}, HTTPStatus.NOT_FOUND
+
+    user_info = {
+        "nickname": user_data.nickname,
+        "first_name": user_data.first_name,
+        "last_name": user_data.last_name,
+        "biography": user_data.biography,
+        "created_at": user_data.created_at,
+    }
+    owner_of_teams = [
+        {
+            "team_name": team.team_name,
+            "team_description": team.team_description,
+            "team_created_date": team.team_created_date,
+        }
+        for team in user_data.team
+    ]
+
+    player_of_teams = [
+        {
+            "team_name": user.team.team_name,
+            "team_description": user.team.team_description,
+            "team_created_date": user.team.team_created_date,
+        }
+        for user in user_data.user
+    ]
+
+    return {
+        "user_info": user_info,
+        "owner_of_teams": owner_of_teams,
+        "player_of_teams": player_of_teams,
     }, HTTPStatus.OK

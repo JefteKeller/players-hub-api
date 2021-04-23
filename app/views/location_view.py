@@ -30,7 +30,7 @@ def register_location():
     session.commit()
 
     return {
-        "location": {
+        "Location": {
             "location_name": new_location.location_name,
             "location_phone": new_location.location_phone,
         }
@@ -43,7 +43,7 @@ def list_locations():
     locations_query = LocationModel.query.all()
 
     return {
-        "locations": [
+        "Locations": [
             {
                 "id": location.id,
                 "location_name": location.location_name,
@@ -61,7 +61,7 @@ def get_location(location_id):
     search_location = LocationModel.query.filter_by(id=location_id).first()
 
     return {
-        "player_in_team": {
+        "location": {
             "location_name": search_location.location_name,
             "location_phone": search_location.location_phone,
         }
