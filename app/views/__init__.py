@@ -12,6 +12,10 @@ def init_app(app: Flask):
 
     app.register_blueprint(bp_team)
 
+    from app.views.invite_user_view import bp_invite_user
+
+    app.register_blueprint(bp_invite_user)
+
     from app.views.match_view import bp_match
 
     app.register_blueprint(bp_match)

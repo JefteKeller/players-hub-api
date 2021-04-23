@@ -12,6 +12,7 @@ from app.models.user_model import UserModel
 from app.models.team_model import TeamModel
 from app.models.team_user_model import TeamUserModel
 from app.models.match_model import MatchModel
+from app.models.invite_user_model import InviteUserModel
 from app.services import user_services
 
 
@@ -246,4 +247,44 @@ def users_history(user_id):
             "victories": victories,
             "losses": losses,
         }
+    }, HTTPStatus.OK
+
+
+@bp_user.route("/<int:user_id>/about", methods=["GET"])
+def user_info(user_id):
+
+    user_data: UserModel = UserModel.query.filter_by(id=user_id).first()
+
+    if not user_data:
+        return {"error": "Invalid user ID"}, HTTPStatus.NOT_FOUND
+
+    user_info = {
+        "nickname": user_data.nickname,
+        "first_name": user_data.first_name,
+        "last_name": user_data.last_name,
+        "biography": user_data.biography,
+        "created_at": user_data.created_at,
+    }
+    owner_of_teams = [
+        {
+            "team_name": team.team_name,
+            "team_description": team.team_description,
+            "team_created_date": team.team_created_date,
+        }
+        for team in user_data.team
+    ]
+
+    player_of_teams = [
+        {
+            "team_name": user.team.team_name,
+            "team_description": user.team.team_description,
+            "team_created_date": user.team.team_created_date,
+        }
+        for user in user_data.user
+    ]
+
+    return {
+        "user_info": user_info,
+        "owner_of_teams": owner_of_teams,
+        "player_of_teams": player_of_teams,
     }, HTTPStatus.OK
