@@ -27,3 +27,7 @@ def init_app(app: Flask):
     from app.views.game_view import bp_game
 
     app.register_blueprint(bp_game)
+
+    from app.views.comment_view import bp_comment
+
+    app.register_blueprint(bp_comment)
