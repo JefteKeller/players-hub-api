@@ -1,18 +1,14 @@
-from typing import Optional
 from flask import Blueprint, request, current_app
 from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity,
 )
 from http import HTTPStatus
-from datetime import timedelta
 
-from app.models.user_model import UserModel
 from app.models.team_model import TeamModel
 from app.models.team_user_model import TeamUserModel
-from app.models.match_model import MatchModel
 from app.models.invite_user_model import InviteUserModel
-from app.services import user_services
+
 
 bp_invite_user = Blueprint("invite_user_view", __name__, url_prefix="/invites")
 
