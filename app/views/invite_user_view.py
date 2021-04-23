@@ -30,20 +30,20 @@ def invite_player_to_a_team(team_id):
     verify_team_owner: TeamModel = TeamModel.query.filter_by(id=team_id).first()
 
     if verify_team_owner.owner_id != owner_id:
-        return {"Error": "You are not the team's owner!"}, HTTPStatus.FORBIDDEN
+        return {"error": "You are not the team's owner!"}, HTTPStatus.FORBIDDEN
 
     verify_player_invite = InviteUserModel.query.filter_by(team_id=team_id).all()
 
     for invite in verify_player_invite:
         if invite.user_id == user_id:
-            return {"Error": "This invite is already made!"}, HTTPStatus.FORBIDDEN
+            return {"error": "This invite is already made!"}, HTTPStatus.FORBIDDEN
 
     verify_player_in_team = TeamUserModel.query.filter_by(team_id=team_id).all()
 
     for team_user in verify_player_in_team:
         if team_user.user_id == user_id:
             return {
-                "Error": "This player is already in this team!"
+                "error": "This player is already in this team!"
             }, HTTPStatus.FORBIDDEN
 
     new_player_invited = InviteUserModel(user_id=user_id, team_id=team_id)
@@ -53,7 +53,7 @@ def invite_player_to_a_team(team_id):
     session.commit()
 
     return {
-        "Invite_made": {
+        "invite_made": {
             "user_name": new_player_invited.user.nickname,
             "team_name": new_player_invited.team.team_name,
             "team_owner_name": verify_team_owner.owner.nickname,
@@ -78,7 +78,7 @@ def accept_invite(team_id):
     )
 
     if not invite:
-        return {"Error": "There isn't any invite for this team"}, HTTPStatus.FORBIDDEN
+        return {"error": "There isn't any invite for this team"}, HTTPStatus.FORBIDDEN
 
     team_name = invite.team.team_name
 
@@ -86,7 +86,7 @@ def accept_invite(team_id):
     session.commit()
 
     if not accept_invite:
-        return {"Message": f"The invite from team {team_name} were rejected"}
+        return {"message": f"The invite from team {team_name} were rejected"}
 
     new_user_in_team = TeamUserModel(user_id=user_id, team_id=team_id)
 
@@ -94,5 +94,5 @@ def accept_invite(team_id):
     session.commit()
 
     return {
-        "Message": f"User {new_user_in_team.user.nickname} joined in team {new_user_in_team.team.team_name}"
+        "Message": f"user {new_user_in_team.user.nickname} joined in team {new_user_in_team.team.team_name}"
     }, HTTPStatus.OK

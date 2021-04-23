@@ -38,7 +38,7 @@ def register_team():
     session.commit()
 
     return {
-        "Team": {
+        "team": {
             "team_name": new_team.team_name,
             "team_description": new_team.team_description,
             "owner_id": new_team.owner_id,
@@ -53,7 +53,7 @@ def list_teams():
     list_of_teams = TeamModel.query.all()
 
     return {
-        "Teams": [
+        "teams": [
             {
                 "id": team.id,
                 "team_name": team.team_name,
@@ -71,14 +71,14 @@ def get_team(team_id):
     found_team: TeamModel = TeamModel.query.get(team_id)
     if found_team:
         return {
-            "Team": {
+            "team": {
                 "id": found_team.id,
                 "team_name": found_team.team_name,
                 "team_description": found_team.team_description,
                 "team_created_date": found_team.team_created_date,
             }
         }, HTTPStatus.OK
-    return {"Error": "Team not found"}, HTTPStatus.NOT_FOUND
+    return {"error": "Team not found"}, HTTPStatus.NOT_FOUND
 
 
 @bp_team.route("/", methods=["PATCH"], strict_slashes=False)
@@ -100,7 +100,7 @@ def update_team():
     session.commit()
 
     return {
-        "Team": {
+        "team": {
             "team_name": found_team.team_name,
             "team_description": found_team.team_description,
             "owner_id": found_team.owner_id,
@@ -121,7 +121,7 @@ def leave_team():
 
     session.commit()
 
-    return {"Message": "Leave team"}, HTTPStatus.OK
+    return {"message": "Leave team"}, HTTPStatus.OK
 
 
 @bp_team.route("/admin/<int:team_id>", methods=["DELETE"])
@@ -145,14 +145,14 @@ def owner_purge_user(team_id):
             session.commit()
 
             return {
-                f"The user {excluir_registro.user.nickname} has been expelled": f"{excluir_registro.team.team_name}",
+                f"the user {excluir_registro.user.nickname} has been expelled": f"{excluir_registro.team.team_name}",
             }, HTTPStatus.OK
         else:
             return {
-                "Error": "You aren't the owner of the team"
+                "error": "You aren't the owner of the team"
             }, HTTPStatus.UNAUTHORIZED
     except AttributeError:
-        return {"Error": "Team id or user id incorrects."}, HTTPStatus.NOT_FOUND
+        return {"error": "Team id or user id incorrects."}, HTTPStatus.NOT_FOUND
 
 
 @bp_team.route("/<int:team_id>/history", methods=["GET"])
@@ -162,7 +162,7 @@ def team_match_history(team_id):
     ).all()
 
     return {
-        "Matches": [
+        "matches": [
             {
                 "Match ID": info.id,
                 "Match date": info.date,
@@ -198,9 +198,9 @@ def delete_team(team_id):
     ).first()
 
     if not team_to_be_deleted:
-        return {"Error": "Invalid team ID"}, HTTPStatus.NOT_FOUND
+        return {"error": "Invalid team ID"}, HTTPStatus.NOT_FOUND
 
     session.delete(team_to_be_deleted)
     session.commit()
 
-    return {"Error": "Deleted team"}, HTTPStatus.OK
+    return {"error": "Deleted team"}, HTTPStatus.OK

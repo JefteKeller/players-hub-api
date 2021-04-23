@@ -61,7 +61,7 @@ def get_location(location_id):
     search_location = LocationModel.query.filter_by(id=location_id).first()
 
     return {
-        "Location": {
+        "location": {
             "location_name": search_location.location_name,
             "location_phone": search_location.location_phone,
         }
