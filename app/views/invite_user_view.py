@@ -94,5 +94,5 @@ def accept_invite(team_id):
     session.commit()
 
     return {
-        "message": f"User {new_user_in_team.user.nickname} joined in team {new_user_in_team.team.team_name}"
+        "Message": f"user {new_user_in_team.user.nickname} joined in team {new_user_in_team.team.team_name}"
     }, HTTPStatus.OK
