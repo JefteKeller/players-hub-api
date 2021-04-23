@@ -7,12 +7,13 @@ from flask_jwt_extended import (
 )
 from http import HTTPStatus
 from datetime import timedelta
+from sqlalchemy import or_
 
 from app.models.user_model import UserModel
 from app.models.team_model import TeamModel
 from app.models.team_user_model import TeamUserModel
 from app.models.match_model import MatchModel
-from app.models.invite_user_model import InviteUserModel
+
 from app.services import user_services
 
 
@@ -203,41 +204,18 @@ def users_history(user_id):
     victories = 0
     losses = 0
 
-    user_teams_search = TeamUserModel.query.filter_by(user_id=user_id).all()
-    user_teams_id = []
-    user_teams_names = []
+    user_teams_id = [user_team.team.id for user_team in user_data.user]
+    user_teams_names = [user_team.team.team_name for user_team in user_data.user]
 
-    for user_team in user_teams_search:
-        user_teams_id.append(user_team.team_id)
-        user_teams_names.append(
-            TeamModel.query.filter_by(id=user_team.team_id).first().team_name
-        )
-
-    all_user_matches = []
+    all_matches = MatchModel.query.all()
 
     for user_team_id in user_teams_id:
-        current_matches_analises = MatchModel.query.filter_by(
-            team_id_1=user_team_id
-        ).all()
-        for match in current_matches_analises:
-            if match.match_winner_id == user_team_id:
-                victories += 1
-            else:
-                losses += 1
-
-        all_user_matches = [*all_user_matches, *current_matches_analises]
-
-        current_matches_analises = MatchModel.query.filter_by(
-            team_id_2=user_team_id
-        ).all()
-
-        for match in current_matches_analises:
-            if match.match_winner_id == user_team_id:
-                victories += 1
-            else:
-                losses += 1
-
-        all_user_matches = [*all_user_matches, *current_matches_analises]
+        for match in all_matches:
+            if match.team_id_1 == user_team_id or match.team_id_2 == user_team_id:
+                if match.match_winner_id == user_team_id:
+                    victories += 1
+                else:
+                    losses += 1
 
     return {
         "user_history": {
