@@ -38,7 +38,7 @@ def register():
     verify_user: UserModel = UserModel.query.filter_by(email=email).first()
 
     if verify_user:
-        return {"msg": f"{email} already exists"}, HTTPStatus.FORBIDDEN
+        return {"error": f"{email} already exists"}, HTTPStatus.FORBIDDEN
 
     new_user = UserModel(
         nickname=nickname,
@@ -79,7 +79,7 @@ def login():
     found_user: UserModel = UserModel.query.filter_by(email=email).first()
 
     if not found_user or not found_user.check_password(password):
-        return {"msg": "Incorrect user or password"}, HTTPStatus.UNAUTHORIZED
+        return {"error": "Incorrect user or password"}, HTTPStatus.UNAUTHORIZED
 
     access_token = create_access_token(
         identity=found_user.id, expires_delta=timedelta(days=7)
@@ -95,7 +95,7 @@ def get_user():
     logged_user: UserModel = UserModel.query.filter_by(id=user_id).first()
 
     if not logged_user:
-        return {"msg": "You are not logged in!"}, HTTPStatus.NOT_FOUND
+        return {"error": "You are not logged in!"}, HTTPStatus.NOT_FOUND
 
     return {
         "user": {
@@ -118,12 +118,12 @@ def delete_user():
     user_to_be_deleted: UserModel = UserModel.query.filter_by(id=user_id).first()
 
     if not user_to_be_deleted:
-        return {"msg": f"You are not logged in!"}, HTTPStatus.NOT_FOUND
+        return {"error": f"You are not logged in!"}, HTTPStatus.NOT_FOUND
 
     session.delete(user_to_be_deleted)
     session.commit()
 
-    return {"msg": f"{user_to_be_deleted.email} deleted"}, HTTPStatus.OK
+    return {"message": f"{user_to_be_deleted.email} deleted"}, HTTPStatus.OK
 
 
 @bp_user.route("/", methods=["PATCH"], strict_slashes=False)
@@ -198,7 +198,9 @@ def users_history(user_id):
     user_data: UserModel = UserModel.query.filter_by(id=user_id).first()
 
     if not user_data:
-        return {"msg": f"There is not any user with id {user_id}"}, HTTPStatus.NOT_FOUND
+        return {
+            "error": f"There is not any user with id {user_id}"
+        }, HTTPStatus.NOT_FOUND
 
     nickname = user_data.nickname
     victories = 0

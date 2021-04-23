@@ -78,7 +78,7 @@ def get_team(team_id):
                 "team_created_date": found_team.team_created_date,
             }
         }, HTTPStatus.OK
-    return {"msg": "team not found"}, HTTPStatus.NOT_FOUND
+    return {"error": "Team not found"}, HTTPStatus.NOT_FOUND
 
 
 @bp_team.route("/", methods=["PATCH"], strict_slashes=False)
@@ -111,7 +111,7 @@ def update_team():
 
 @bp_team.route("/self", methods=["DELETE"])
 @jwt_required()
-def all_team_user():
+def leave_team():
     session = current_app.db.session
     res = request.get_json()
     team_idt = res.get("team_id")
@@ -121,7 +121,7 @@ def all_team_user():
 
     session.commit()
 
-    return {"msg": "Leave the team"}, HTTPStatus.OK
+    return {"message": "Leave team"}, HTTPStatus.OK
 
 
 @bp_team.route("/admin/<int:team_id>", methods=["DELETE"])
@@ -145,12 +145,14 @@ def owner_purge_user(team_id):
             session.commit()
 
             return {
-                f"O jogador {excluir_registro.user.nickname} foi expulso do time": f"{excluir_registro.team.team_name}",
+                f"the user {excluir_registro.user.nickname} has been expelled": f"{excluir_registro.team.team_name}",
             }, HTTPStatus.OK
         else:
-            return {"Error": "Você não é o dono do time"}, HTTPStatus.UNAUTHORIZED
+            return {
+                "error": "You aren't the owner of the team"
+            }, HTTPStatus.UNAUTHORIZED
     except AttributeError:
-        return {"Error": "Team id or user id incorrects."}, HTTPStatus.NOT_FOUND
+        return {"error": "Team id or user id incorrects."}, HTTPStatus.NOT_FOUND
 
 
 @bp_team.route("/<int:team_id>/history", methods=["GET"])
@@ -160,22 +162,22 @@ def team_match_history(team_id):
     ).all()
 
     return {
-        "Matches": [
+        "matches": [
             {
                 "Match ID": info.id,
                 "Match date": info.date,
                 "Match winner": info.match_winner.team_name,
                 "Team 1 ": {
+                    "Team ID": info.team_1.id,
                     "Team name": info.team_1.team_name,
                     "Team description": info.team_1.team_description,
-                    "Data de criação do time": info.team_1.team_created_date,
-                    "Team ID": info.team_1.id,
+                    "Created at": info.team_1.team_created_date,
                 },
                 "Team 2 ": {
+                    "Team ID": info.team_2.id,
                     "Team name": info.team_2.team_name,
                     "Team description": info.team_2.team_description,
-                    "Data de criação do time": info.team_2.team_created_date,
-                    "Team ID": info.team_2.id,
+                    "Created at": info.team_2.team_created_date,
                 },
             }
             for info in team_history
@@ -196,9 +198,9 @@ def delete_team(team_id):
     ).first()
 
     if not team_to_be_deleted:
-        return {"msg": "Invalid team ID"}, HTTPStatus.NOT_FOUND
+        return {"error": "Invalid team ID"}, HTTPStatus.NOT_FOUND
 
     session.delete(team_to_be_deleted)
     session.commit()
 
-    return {"msg": "Deleted team"}, HTTPStatus.OK
+    return {"error": "Deleted team"}, HTTPStatus.OK
