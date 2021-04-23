@@ -9,3 +9,4 @@ from .game_model import GameModel
 from .match_model import MatchModel
 from .location_model import LocationModel
 from .team_user_model import TeamUserModel
+from .comment_model import CommentModel

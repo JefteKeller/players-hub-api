@@ -12,6 +12,10 @@ def init_app(app: Flask):
 
     app.register_blueprint(bp_team)
 
+    from app.views.invite_user_view import bp_invite_user
+
+    app.register_blueprint(bp_invite_user)
+
     from app.views.match_view import bp_match
 
     app.register_blueprint(bp_match)
@@ -23,3 +27,7 @@ def init_app(app: Flask):
     from app.views.game_view import bp_game
 
     app.register_blueprint(bp_game)
+
+    from app.views.comment_view import bp_comment
+
+    app.register_blueprint(bp_comment)
