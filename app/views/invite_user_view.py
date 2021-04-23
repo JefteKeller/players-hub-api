@@ -92,3 +92,30 @@ def accept_invite(team_id):
     return {
         "Message": f"user {new_user_in_team.user.nickname} joined in team {new_user_in_team.team.team_name}"
     }, HTTPStatus.OK
+
+
+@bp_invite_user.route("/users/self", methods=["GET"], strict_slashes=False)
+@jwt_required()
+def get_user_invites():
+    user_id = get_jwt_identity()
+
+    invites: InviteUserModel = InviteUserModel.query.filter_by(user_id=user_id).all()
+
+    if not invites:
+        return {
+            "error": "There isn't invites of any team for you!"
+        }, HTTPStatus.NOT_FOUND
+
+    teams = [invite.team for invite in invites]
+
+    return {
+        "user_teams_invites": [
+            {
+                "team_name": team.team_name,
+                "team_description": team.team_description,
+                "team_created_date": team.team_created_date,
+                "team_owner": team.owner.nickname,
+            }
+            for team in teams
+        ]
+    }, HTTPStatus.OK
