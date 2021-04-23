@@ -19,14 +19,12 @@ def register_match():
     team_id_1 = res.get("team_id_1")
     team_id_2 = res.get("team_id_2")
     game_id = res.get("game_id")
-    match_winner_id = res.get("match_winner_id")
     date = res.get("date")
 
     new_match = MatchModel(
         team_id_1=team_id_1,
         team_id_2=team_id_2,
         game_id=game_id,
-        match_winner_id=match_winner_id,
         date=date,
     )
 
