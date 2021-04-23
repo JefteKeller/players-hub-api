@@ -46,7 +46,7 @@ def list_matches():
     for match in match_list:
         res.append(match_serializer(match))
 
-    return {"matches": res}, HTTPStatus.OK
+    return {"Matches": res}, HTTPStatus.OK
 
 
 @bp_match.route("/<int:match_id>", methods=["GET"], strict_slashes=False)
@@ -56,7 +56,7 @@ def get_match(match_id):
 
     match_return = match_serializer(match)
 
-    return {"match": match_return}, HTTPStatus.OK
+    return {"Match": match_return}, HTTPStatus.OK
 
 
 @bp_match.route("/<int:match_id>", methods=["PATCH"], strict_slashes=False)
@@ -81,11 +81,11 @@ def update_match(match_id):
     )
 
     if not match_to_update:
-        return {"error": "Match not found"}, HTTPStatus.NOT_FOUND
+        return {"Error": "Match not found"}, HTTPStatus.NOT_FOUND
 
     session.commit()
 
     match: MatchModel = MatchModel.query.get(match_id)
     match_return = match_serializer(match)
 
-    return {"match": match_return}, HTTPStatus.OK
+    return {"Match": match_return}, HTTPStatus.OK

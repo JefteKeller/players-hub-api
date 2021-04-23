@@ -37,7 +37,7 @@ def register_game():
     session.commit()
 
     return {
-        "game": {
+        "Game": {
             "game_name": new_game.game_name,
             "game_type": new_game.game_type,
             "game_description": new_game.game_description,
@@ -52,7 +52,7 @@ def list_games():
     list_of_games: GameModel = GameModel.query.all()
 
     return {
-        "games": [
+        "Games": [
             {
                 "id": game.id,
                 "game_name": game.game_name,
@@ -64,17 +64,17 @@ def list_games():
     }, HTTPStatus.OK
 
 
-@bp_game.route("/get/<int:game_id>", methods=["GET"], strict_slashes=False)
+@bp_game.route("/<int:game_id>", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def get_game(game_id):
 
     found_game: GameModel = GameModel.query.get(game_id)
 
     if not found_game:
-        return {"msg": "Enter a valid game ID"}, HTTPStatus.BAD_REQUEST
+        return {"Message": "Enter a valid game ID"}, HTTPStatus.BAD_REQUEST
 
     return {
-        "game": {
+        "Game": {
             "id": found_game.id,
             "game_name": found_game.game_name,
             "game_type": found_game.game_type,
@@ -94,7 +94,7 @@ def update_game(game_id):
     found_game: GameModel = GameModel.query.filter_by(id=game_id).first()
 
     if not found_game:
-        return {"msg": "Insert a valid game ID"}
+        return {"Message": "Insert a valid game ID"}
 
     for key, value in body.items():
         setattr(found_game, key, value)
@@ -103,7 +103,7 @@ def update_game(game_id):
     session.commit()
 
     return {
-        "game": {
+        "Game": {
             "id": found_game.id,
             "game_name": found_game.game_name,
             "game_type": found_game.game_type,
