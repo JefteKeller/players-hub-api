@@ -1,0 +1,56 @@
+name: CI
+
+on: push
+
+jobs:
+    ci-tests:
+        runs-on: ubuntu-latest
+
+        services:
+            postgres:
+                image: postgres:13.2
+                env:
+                    POSTGRES_DB: test_players_hub
+                    POSTGRES_USER: test_user
+                    POSTGRES_PASSWORD: "test_password"
+                    POSTGRES_HOST_AUTH_METHOD: trust
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd pg_isready
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
+        steps:
+            - name: Check out repository code
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 1
+
+            - name: Set up Python 3.9.4
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.9.4
+
+            - name: Install dependencies
+              run: |
+                  python -V
+                  python -m pip install -U pip
+                  python -m pip install -r requirements.txt
+
+            - name: Tests for Code Style
+              run: python -m black --check .
+
+            - name: Tests with Pytest
+              env:
+                  FLASK_RUN_PORT: 4444
+                  JWT_SECRET_KEY: "test_a7f828f6ff20e3481f5298ae977de69e0ece4c95afde7257e42726c6e08c425f"
+
+                  JSON_SORT_KEYS: "False"
+                  SQLALCHEMY_TRACK_MODIFICATIONS: "False"
+
+                  DB_URI_TEST: "postgresql://test_user:test_password@localhost:5432/test_players_hub"
+                  DB_URI_DEV: ""
+                  DB_URI_PROD: ""
+              run: python -m pytest -svv
